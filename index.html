@@ -71,9 +71,9 @@
     'whoi_history','my_books','habit_tracker','cali_log','wia2','wia2aff','wia2q','wia2wq',
     'hlb','hlr','ass_checkin','ass_log','ass_entries_asking','ass_entries_giving',
     'bel_foundation','bel_evidence','bel_failure','belief_beliefs',
-    'balance_data','that_girl_data','vision_items','ritual_state','user_rituals',
+    'balance_data','vision_items','ritual_state','user_rituals',
     'bc_habits_data','face_habits_data','daily_data','rfm_data','jesus_data',
-    'my_routine_data','routine_todos','routine_notes','routine_photos'];
+    'my_routine_data','routine_todos','routine_notes','routine_photos','wia_photos'];
   const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_','rhythm_day_','rhythm_month_','rhythm_year_'];
 
   function _shouldSync(key) {
@@ -112,7 +112,6 @@
     if (!data) return;
     var changed = false;
     var jesusChanged = false;
-    var tgChanged = false;
 
     // Strip savedAt from comparison so timestamp differences don't trigger re-renders
     function _stripMeta(obj) {
@@ -136,7 +135,6 @@
           if (inStripped !== exStripped) {
             changed = true;
             if (k === 'jesus_data') jesusChanged = true;
-            if (k === 'that_girl_data') tgChanged = true;
           }
         } catch(e) { changed = true; }
       }
@@ -163,14 +161,6 @@
             return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;"><div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + dl + '</div><button onclick="jesusDeleteGodSaid('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">\u00d7</button></div><div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;">' + x.body + '</div></div>';
           }).join('') : '';
         }
-      } catch(e) {}
-    }
-
-    if (tgChanged) {
-      try {
-        var _tgf = localStorage.getItem('that_girl_data');
-        if (_tgf) { tgData = JSON.parse(_tgf); if (typeof tgData !== 'object' || Array.isArray(tgData)) tgData = {}; }
-        if (typeof tgRenderAll === 'function') tgRenderAll(true);
       } catch(e) {}
     }
 
@@ -237,7 +227,6 @@
     if (id === 'schedule' && typeof loadPlannerDay === 'function') try { loadPlannerDay(); } catch(e) {}
     if (id === 'home' && typeof renderAnalytics === 'function') try { renderAnalytics(); } catch(e) {}
     if (id === 'vision' && typeof renderDimensionBoards === 'function') try { renderDimensionBoards(); } catch(e) {}
-    if (id === 'vision' && typeof tgRenderAll === 'function' ) tgRenderAll();
     if (id === 'me' && typeof rfmRender === 'function') rfmRender();
     if (id === 'jesus' && typeof jesusLoad === 'function') {
       jesusLoad();
@@ -739,6 +728,8 @@
   .wia-identity-card::after { content:''; }
   .wia-id-label { font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:300; color:var(--gray); margin-bottom:6px; }
   .wia-id-name { font-family:'Lora',serif; font-size:1.2rem; font-weight:300; color:var(--black); margin-bottom:1rem; font-style:italic; min-height:28px; }
+  .wia-id-name div { margin-bottom:0.3rem; }
+  .wia-id-name div:last-child { margin-bottom:0; }
   .wia-id-traits { display:flex; flex-wrap:wrap; gap:5px; }
   .wia-trait-tag { background:#f0f0ec; border:1px solid #c8c8c5; padding:3px 10px; font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:var(--black); }
   .wia-trait-tag.empty { border-style:dashed; color:var(--gray); font-style:italic; }
@@ -811,7 +802,6 @@ window.addEventListener('error', function(e) {
   <div class="logo">love myself</div>
   <div class="nav-tabs">
     <button class="nav-tab" onclick="showSection('jesus')">Jesus Christ</button>
-    <button class="nav-tab active" onclick="showSection('home')">Home</button>
     <button class="nav-tab" onclick="showSection('vision')">Vision</button>
     <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
     <button class="nav-tab" onclick="showSection('journal')">Journal</button>
@@ -845,14 +835,13 @@ window.addEventListener('error', function(e) {
           <div class="home-link" onclick="showSection('me');setTimeout(()=>showMeTab('whiam'),100)">Who I Am</div>
           <div class="home-link" onclick="showSection('me');setTimeout(()=>showMeTab('assertive'),100)">Assertive</div>
           <div class="home-link" onclick="showSection('me');setTimeout(()=>showMeTab('assertive'),100)">Believe</div>
-          <div class="home-link last" onclick="showSection('me');setTimeout(()=>showMeTab('rightforme'),100)">Right For Me</div>
+          <div class="home-link last" onclick="showSection('me');setTimeout(()=>showMeTab('intj'),100)">INTJ</div>
         </div>
       </div>
 
       <div class="home-card" style="cursor:default;">
         <div class="home-card-title">Schedule</div>
         <div class="home-card-links">
-          <div class="home-link" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('routine'),100)">My Routine</div>
           <div class="home-link" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)">Daily Schedule</div>
           <div class="home-link last" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('habits'),100)">Calisthenics</div>
 
@@ -918,27 +907,6 @@ window.addEventListener('error', function(e) {
   <div id="vision-board-section" style="margin-bottom:2rem;"></div>
   <div id="dimension-boards"></div>
 
-  <!-- That Girl Vision -->
-  <hr style="margin:2.5rem 0;">
-  <div class="subtitle">She's already in you</div>
-  <h1>What it looks like to be that girl.</h1>
-  <div style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:'Lora',serif;margin:0.5rem 0 1.5rem;line-height:1.6;">Paint a picture of her, how she moves, feels, lives, shows up 🤍</div>
-
-  <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">
-    <button class="vision-type-btn active" id="tgcat-morning"   onclick="tgSetCategory('morning')"      >MORNING</button>
-    <button class="vision-type-btn"        id="tgcat-looks"     onclick="tgSetCategory('looks')"        >LOOKS</button>
-    <button class="vision-type-btn"        id="tgcat-health"    onclick="tgSetCategory('health')"       >HEALTH</button>
-    <button class="vision-type-btn"        id="tgcat-mindset"   onclick="tgSetCategory('mindset')"      >MINDSET</button>
-    <button class="vision-type-btn"        id="tgcat-time"      onclick="tgSetCategory('time')"         >TIME</button>
-    <button class="vision-type-btn"        id="tgcat-relationships" onclick="tgSetCategory('relationships')">RELATIONSHIPS</button>
-    <button class="vision-type-btn"        id="tgcat-feeling"   onclick="tgSetCategory('feeling')"      >FEELING</button>
-  </div>
-  <div style="display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid #c8c8c5;padding-bottom:0.4rem;margin-bottom:0.8rem;">
-    <input id="tg-main-input" type="text" placeholder="e.g. she rises early, makes her bed…" onkeydown="if(event.key==='Enter')tgAddMain()" onblur="tgAddMain()" style="flex:1;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-  </div>
-  <div id="tg-all-list" style="margin-bottom:1.5rem;"></div>
-
-
 </div>
 
 <div class="section" id="schedule">
@@ -974,10 +942,9 @@ window.addEventListener('error', function(e) {
        Notes and Photos are inside the right column, below Dinner. -->
   <!-- Main tabs: My Routine | Schedule | Habits -->
   <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.2rem;">
-    <button id="schtab-routine" onclick="showSchedMainTab('routine')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">My Routine</button>
     <button id="schtab-schedule" onclick="showSchedMainTab('schedule')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid var(--black);font-weight:300;">Daily Schedule</button>
     <button id="schtab-habits" onclick="showSchedMainTab('habits')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Calisthenics</button>
-    <button id="schtab-rhythminfp" onclick="showSchedMainTab('rhythminfp')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Rhythm & INFP</button>
+    <button id="schtab-rhythminfp" onclick="showSchedMainTab('rhythminfp')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">INFP</button>
 
   </div>
 
@@ -1188,76 +1155,6 @@ window.addEventListener('error', function(e) {
   </div>
   </div><!-- end schmain-schedule -->
 
-  <!-- MY ROUTINE TAB -->
-  <div id="schmain-routine" style="display:none;">
-
-    <!-- Routine slot selector -->
-    <div style="display:flex;gap:0;margin-bottom:1rem;">
-      <button id="rtab-4am" onclick="routineShowSlot('4am')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;background:var(--black);color:var(--white);border:none;padding:0.55rem 0.5rem;font-weight:300;">4:00 AM</button>
-      <button id="rtab-6am" onclick="routineShowSlot('6am')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;background:var(--white);color:var(--black);border:none;border:1px solid #e8e8e5;padding:0.55rem 0.5rem;font-weight:300;">6:00 AM</button>
-    </div>
-
-    <!-- Track Days toggle -->
-    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;cursor:pointer;" onclick="routineToggleCal()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-      <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Track Days</span>
-    </div>
-
-    <!-- Track Days calendar -->
-    <div id="routine-cal-wrap" style="display:none;margin-bottom:1.2rem;border:1px solid #e8e8e5;padding:0.8rem;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-        <button onclick="routineCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
-        <div id="routine-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
-        <button onclick="routineCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;" id="routine-cal-daynames"></div>
-      <div id="routine-cal-grid"></div>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;color:var(--gray);margin-top:0.6rem;">Tap a day to check off that day's routine 🌸</div>
-    </div>
-
-    <!-- Routine slot: 4AM -->
-    <div id="routine-slot-4am">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.2rem;">Chores done before work · sleeps 9 PM</div>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);margin-bottom:1rem;" id="routine-4am-progress">Today · 0 of 22 done</div>
-      <div id="routine-4am-list" style="display:flex;flex-direction:column;gap:0;"></div>
-    </div>
-
-    <!-- Routine slot: 6AM -->
-    <div id="routine-slot-6am" style="display:none;">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.2rem;">Chores done before work · sleeps 10 PM</div>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);margin-bottom:1rem;" id="routine-6am-progress">Today · 0 of 21 done</div>
-      <div id="routine-6am-list" style="display:flex;flex-direction:column;gap:0;"></div>
-    </div>
-
-    <!-- Separator -->
-    <div style="border-top:1px solid #e8e8e5;margin:1.5rem 0;"></div>
-
-    <!-- To Do -->
-    <div style="margin-bottom:1.2rem;">
-      <div class="planner-label" style="margin-bottom:0.5rem;">To Do</div>
-      <div id="routine-todo-list" style="margin-bottom:0.4rem;"></div>
-      <input id="routine-todo-input" placeholder="Add task..." onkeydown="if(event.key==='Enter')routineAddTodo()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.2rem 0;box-sizing:border-box;">
-    </div>
-
-    <!-- Notes -->
-    <div style="margin-bottom:1.2rem;">
-      <div class="planner-label" style="margin-bottom:0.5rem;">Notes</div>
-      <input id="routine-notes-input" placeholder="Write a note... press Enter to save" onkeydown="if(event.key==='Enter'){event.preventDefault();routineAddNote();}" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.2rem 0;box-sizing:border-box;">
-      <div id="routine-notes-list" style="margin-top:0.5rem;"></div>
-    </div>
-
-    <!-- Photos -->
-    <div style="margin-bottom:1.2rem;">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div class="planner-label">Photos</div>
-        <label for="routine-photo-input" style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">+ Add</label>
-        <input type="file" id="routine-photo-input" accept="image/*" onchange="routineAddPhoto(this)" style="display:none;">
-      </div>
-      <div id="routine-photos-list" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
-    </div>
-
-  </div><!-- end schmain-routine -->
-
   <!-- HABITS TAB -->
   <div id="schmain-habits" style="display:none;">
     <div id="schhabits-calisthenics"></div>
@@ -1268,13 +1165,9 @@ window.addEventListener('error', function(e) {
 
   <!-- RHYTHM & INFP COMBINED TAB -->
   <div id="schmain-rhythminfp" style="display:none;">
-    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.2rem;">
-      <button id="ritab-rhythm" onclick="showRhythmInfpTab('rhythm')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.45rem 0.3rem 0.5rem;border-bottom:2px solid var(--black);font-weight:300;">My Rhythm</button>
-      <button id="ritab-infp" onclick="showRhythmInfpTab('infp')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.45rem 0.3rem 0.5rem;border-bottom:2px solid transparent;font-weight:300;">INFP</button>
-    </div>
 
   <!-- INFP TAB -->
-  <div id="schmain-infp" style="display:none;">
+  <div id="schmain-infp">
     <div class="subtitle" style="margin-bottom:0.5rem;">INFP</div>
     <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Your inner world matters. 🤍</div>
 
@@ -1346,172 +1239,6 @@ window.addEventListener('error', function(e) {
   </div>
 
 
-
-  <!-- MY RHYTHM TAB -->
-  <div id="schmain-rhythm" style="display:none;">
-    <div class="subtitle" style="margin-bottom:0.5rem;">My Rhythm</div>
-    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">You don't run on schedules. You run on meaning. 🌊</div>
-
-    <!-- Inner sub-tabs -->
-    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.2rem;">
-      <button id="rhythmtab-today" onclick="showRhythmTab('today')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.45rem 0.3rem 0.5rem;border-bottom:2px solid var(--black);font-weight:300;">Today</button>
-      <button id="rhythmtab-month" onclick="showRhythmTab('month')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.45rem 0.3rem 0.5rem;border-bottom:2px solid transparent;font-weight:300;">Monthly</button>
-      <button id="rhythmtab-year" onclick="showRhythmTab('year')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.45rem 0.3rem 0.5rem;border-bottom:2px solid transparent;font-weight:300;">Yearly</button>
-    </div>
-
-    <!-- TODAY sub-tab -->
-    <div id="rhythmsub-today">
-
-      <div id="rhythm-saved-at" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);text-align:right;margin-bottom:0.5rem;min-height:1rem;"></div>
-
-      <!-- Breathing check-in -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-        <div class="planner-label" style="margin-bottom:0.6rem;">Today's Rhythm</div>
-        <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:0.6rem;">Are you inhaling or exhaling today?</div>
-        <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
-          <button id="rhythm-inhale-btn" onclick="rhythmSetMode('inhale')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #c8c8c5;background:transparent;padding:0.5rem;cursor:pointer;color:var(--gray);">🌿 Inhale Rest &amp; Be</button>
-          <button id="rhythm-exhale-btn" onclick="rhythmSetMode('exhale')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #c8c8c5;background:transparent;padding:0.5rem;cursor:pointer;color:var(--gray);">🌬 Exhale Do &amp; Output</button>
-        </div>
-        <div id="rhythm-mode-note" style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);min-height:1.2rem;"></div>
-      </div>
-
-      <!-- Must + Magic -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-        <div class="planner-label" style="margin-bottom:0.3rem;">Must + Magic</div>
-        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;">Protect both. If you only do Must, you'll burn out.</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
-          <!-- Must -->
-          <div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Must</div>
-            <div id="rhythm-must-list" style="margin-bottom:0.4rem;"></div>
-            <input id="rhythm-must-input" placeholder="Add a must..." onkeydown="if(event.key==='Enter')rhythmAddItem('must')" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;outline:none;padding:0.2rem 0;">
-          </div>
-          <!-- Magic -->
-          <div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Magic ✨</div>
-            <div id="rhythm-magic-list" style="margin-bottom:0.4rem;"></div>
-            <input id="rhythm-magic-input" placeholder="Add some magic..." onkeydown="if(event.key==='Enter')rhythmAddItem('magic')" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;outline:none;padding:0.2rem 0;">
-          </div>
-        </div>
-      </div>
-
-      <!-- 3 Things -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-        <div class="planner-label" style="margin-bottom:0.3rem;">3 Things Today</div>
-        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;">1 important · 1 necessary · 1 for you</div>
-        <div style="margin-bottom:0.5rem;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.2rem;">Important</div>
-          <div style="display:flex;align-items:center;gap:0.5rem;">
-            <div id="rhythm-3-imp-done" onclick="rhythmToggle3('imp')" style="cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid #c8c8c5;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></div>
-            <input id="rhythm-3-imp" placeholder="The one important thing..." style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.15rem 0;" onchange="rhythmSave3()">
-          </div>
-        </div>
-        <div style="margin-bottom:0.5rem;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.2rem;">Necessary</div>
-          <div style="display:flex;align-items:center;gap:0.5rem;">
-            <div id="rhythm-3-nec-done" onclick="rhythmToggle3('nec')" style="cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid #c8c8c5;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></div>
-            <input id="rhythm-3-nec" placeholder="The one necessary thing..." style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.15rem 0;" onchange="rhythmSave3()">
-          </div>
-        </div>
-        <div>
-          <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.2rem;">For Me ✨</div>
-          <div style="display:flex;align-items:center;gap:0.5rem;">
-            <div id="rhythm-3-me-done" onclick="rhythmToggle3('me')" style="cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid #c8c8c5;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></div>
-            <input id="rhythm-3-me" placeholder="One thing just for you..." style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.15rem 0;" onchange="rhythmSave3()">
-          </div>
-        </div>
-      </div>
-
-      <!-- Guilt check -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label" style="margin-bottom:0.3rem;">Check In With Yourself</div>
-        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;font-weight:300;color:var(--gray);margin-bottom:0.7rem;">Your solitude today. Which kind is it?</div>
-        <div style="display:flex;gap:0.5rem;margin-bottom:0.6rem;">
-          <button id="rhythm-sol-restore" onclick="rhythmSetSolitude('restore')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.06em;border:1px solid #c8c8c5;background:transparent;padding:0.45rem 0.3rem;cursor:pointer;color:var(--gray);">🌿 Restoring me</button>
-          <button id="rhythm-sol-avoid" onclick="rhythmSetSolitude('avoid')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.06em;border:1px solid #c8c8c5;background:transparent;padding:0.45rem 0.3rem;cursor:pointer;color:var(--gray);">🌀 Hiding from something</button>
-        </div>
-        <div id="rhythm-sol-note" style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);min-height:1rem;"></div>
-      </div>
-    </div>
-
-    <!-- MONTHLY sub-tab -->
-    <div id="rhythmsub-month" style="display:none;">
-      <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Set your intention for the month. What do you want more of? Less of?</div>
-
-      <!-- Month selector -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <button onclick="rhythmMonthShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.2rem;">&#8249;</button>
-        <div id="rhythm-month-label" style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
-        <button onclick="rhythmMonthShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.2rem;">&#8250;</button>
-      </div>
-
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-        <div class="planner-label" style="margin-bottom:0.4rem;">Intention</div>
-        <textarea id="rhythm-month-intention" placeholder="This month I want to focus on..." onchange="rhythmSaveMonth()" style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.88rem;outline:none;resize:none;min-height:55px;line-height:1.8;color:var(--black);box-sizing:border-box;"></textarea>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;">
-        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-          <div class="planner-label" style="margin-bottom:0.4rem;">More of</div>
-          <div id="rhythm-month-more-list" style="margin-bottom:0.4rem;"></div>
-          <input id="rhythm-month-more-input" placeholder="Add..." onkeydown="if(event.key==='Enter')rhythmAddMonthItem('more')" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;outline:none;padding:0.2rem 0;">
-        </div>
-        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-          <div class="planner-label" style="margin-bottom:0.4rem;">Less of</div>
-          <div id="rhythm-month-less-list" style="margin-bottom:0.4rem;"></div>
-          <input id="rhythm-month-less-input" placeholder="Add..." onkeydown="if(event.key==='Enter')rhythmAddMonthItem('less')" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;outline:none;padding:0.2rem 0;">
-        </div>
-      </div>
-
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label" style="margin-bottom:0.4rem;">The one meaningful thing this month</div>
-        <input id="rhythm-month-one" placeholder="One thing that would make this month feel worth it..." onchange="rhythmSaveMonth()" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.2rem 0;">
-      </div>
-    </div>
-
-    <!-- YEARLY sub-tab -->
-    <div id="rhythmsub-year" style="display:none;">
-      <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:1rem;line-height:1.6;">The big picture. Not goals, just a direction. A feeling. A version of yourself.</div>
-
-      <!-- Year selector -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <button onclick="rhythmYearShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.2rem;">&#8249;</button>
-        <div id="rhythm-year-label" style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
-        <button onclick="rhythmYearShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.2rem;">&#8250;</button>
-      </div>
-
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-        <div class="planner-label" style="margin-bottom:0.4rem;">Word of the Year</div>
-        <input id="rhythm-year-word" placeholder="One word that guides this year..." onchange="rhythmSaveYear()" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:1rem;outline:none;padding:0.2rem 0;color:var(--black);">
-      </div>
-
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-        <div class="planner-label" style="margin-bottom:0.4rem;">Who I want to be this year</div>
-        <textarea id="rhythm-year-vision" placeholder="Describe the version of yourself you're becoming..." onchange="rhythmSaveYear()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:300;outline:none;resize:none;min-height:70px;line-height:1.8;color:var(--black);box-sizing:border-box;"></textarea>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;">
-        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-          <div class="planner-label" style="margin-bottom:0.4rem;">Soul goals</div>
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;color:var(--gray);margin-bottom:0.5rem;">Things that feed your inner world</div>
-          <div id="rhythm-year-soul-list" style="margin-bottom:0.4rem;"></div>
-          <input id="rhythm-year-soul-input" placeholder="Add..." onkeydown="if(event.key==='Enter')rhythmAddYearItem('soul')" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;outline:none;padding:0.2rem 0;">
-        </div>
-        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-          <div class="planner-label" style="margin-bottom:0.4rem;">Real-world goals</div>
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;color:var(--gray);margin-bottom:0.5rem;">Things you want to actually do</div>
-          <div id="rhythm-year-real-list" style="margin-bottom:0.4rem;"></div>
-          <input id="rhythm-year-real-input" placeholder="Add..." onkeydown="if(event.key==='Enter')rhythmAddYearItem('real')" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;outline:none;padding:0.2rem 0;">
-        </div>
-      </div>
-
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label" style="margin-bottom:0.4rem;">What I'm letting go of this year</div>
-        <textarea id="rhythm-year-release" placeholder="Patterns, habits, thoughts, people, expectations..." onchange="rhythmSaveYear()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:300;outline:none;resize:none;min-height:55px;line-height:1.8;color:var(--black);box-sizing:border-box;"></textarea>
-      </div>
-    </div>
-
-  </div>
 
   </div><!-- end schmain-rhythminfp -->
 
@@ -1623,14 +1350,14 @@ function showSection(id){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   var sec = document.getElementById(id);
   if (sec) sec.classList.add('active');
-  const map=['jesus','home','vision','schedule','me','journal'];
+  const map=['jesus','vision','schedule','journal','me'];
   const navTab = document.querySelectorAll('.nav-tab')[map.indexOf(id)];
   if (navTab) navTab.classList.add('active');
   // Remember which section we're on so refresh returns here
   try { localStorage.setItem('last_section', id); } catch(e) {}
   if (id === 'home') renderAnalytics();
   if (id === 'schedule') { try { initScheduleDatePicker(); } catch(e) {} loadPlannerDay(); }
-  if (id === 'vision') { loadThatGirl(); renderVisionBoard(true); }
+  if (id === 'vision') { renderVisionBoard(true); }
   if (id === 'me') { initMeSection(); initWhiAm(); showMeTab('whiam'); }
   if (id === 'journal') { showJournalTab('belief'); }
   if (id === 'jesus' && typeof jesusInit === 'function') jesusInit();
@@ -2049,83 +1776,6 @@ whoiStyle.textContent = `
 `;
 document.head.appendChild(whoiStyle);
 
-// That Girl per-field, saves on Enter or blur
-var tgData = JSON.parse(localStorage.getItem('that_girl_data') || '{}');
-
-function tgSaveToDB() {
-  window._tgLastSave = Date.now();
-  window._rawLS('that_girl_data', JSON.stringify(tgData));
-  if (typeof window.syncToCloud === 'function') window.syncToCloud('that_girl_data', tgData);
-}
-
-var _tgCurrentCat = 'morning';
-
-function tgSetCategory(key) {
-  _tgCurrentCat = key;
-  ['morning','looks','health','mindset','time','relationships','feeling'].forEach(function(k) {
-    var btn = document.getElementById('tgcat-' + k);
-    if (btn) btn.classList.toggle('active', k === key);
-  });
-}
-
-function tgAddMain() {
-  var input = document.getElementById('tg-main-input');
-  if (!input) return;
-  var key = _tgCurrentCat;
-  var val = input.value.trim();
-  if (!val) return;
-  if (!tgData[key]) tgData[key] = [];
-  var now = new Date();
-  var time = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    + ' · ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  tgData[key].push({ id: String(Date.now()), text: val, time: time });
-  input.value = '';
-  tgSaveToDB();
-  tgRenderAll(true);
-}
-
-function tgRemove(key, id) {
-  if (tgData[key]) tgData[key] = tgData[key].filter(function(e) { return String(e.id) !== String(id); });
-  tgSaveToDB();
-  tgRenderAll(true);
-}
-
-var TG_LABELS = { morning:'MORNING', looks:'LOOKS', health:'HEALTH', mindset:'MINDSET', time:'TIME', relationships:'RELATIONSHIPS', feeling:'FEELING' };
-
-function tgRenderAll(skipLoad) {
-  if (!skipLoad) {
-    try { var _f=localStorage.getItem('that_girl_data'); if(_f){ tgData=JSON.parse(_f); if(typeof tgData!=='object'||Array.isArray(tgData)) tgData={}; } } catch(e) {}
-  }
-  var el = document.getElementById('tg-all-list');
-  if (!el) return;
-  var keys = ['morning','looks','health','mindset','time','relationships','feeling'];
-  var html = '';
-  keys.forEach(function(key) {
-    var entries = tgData[key] || [];
-    if (!entries.length) return;
-    html += '<div style="margin-bottom:0.6rem;">'
-      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.2rem;">' + TG_LABELS[key] + '</div>';
-    entries.forEach(function(e) {
-      html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:0.25rem 0;border-bottom:1px solid var(--light);">'
-        + '<div style="flex:1;">'
-        + '<span style="font-family:\'Nunito\',sans-serif;font-size:1rem;font-weight:300;color:var(--black);">' + e.text.replace(/</g,'&lt;') + '</span>'
-        + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;color:var(--gray);margin-left:0.5rem;">' + e.time + '</span>'
-        + '</div>'
-        + '<button onclick="tgRemove(\'' + key + '\',\'' + e.id + '\')" style="font-size:0.6rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;padding:0 0 0 0.5rem;">✕</button>'
-        + '</div>';
-    });
-    html += '</div>';
-  });
-  el.innerHTML = html;
-}
-
-function tgRenderList(key) { tgRenderAll(); }
-
-function loadThatGirl() { tgRenderAll(); }
-function saveThatGirl() {}
-function tgAdd(key) {}
-function tgToggle(key) {}
-
 let whoiItems = JSON.parse(localStorage.getItem('whoi_history') || '[]');
 if (!Array.isArray(whoiItems)) whoiItems = [];
 let whoiType = 'word';
@@ -2211,11 +1861,16 @@ function renderWhoiGrid(fromStorage) {
   if (!whoiItems.length) { el.innerHTML = ''; return; }
   el.innerHTML = whoiItems.map(item => `
     <div style="display:flex;align-items:flex-start;gap:0.4rem;padding:0.25rem 0;">
-      <span style="color:var(--black);font-size:0.7rem;margin-top:0.15rem;flex-shrink:0;">•</span>
-      <span style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;flex:1;">${item.content||''}</span>
+      ${item.type === 'image' ? '<span style="flex-shrink:0;"></span>' : '<span style="color:var(--black);font-size:0.7rem;margin-top:0.15rem;flex-shrink:0;">•</span>'}
+      ${item.type === 'image'
+        ? (item.uploading
+          ? `<span style="font-family:'Nunito',sans-serif;font-size:0.7rem;color:var(--gray);flex:1;">Uploading...</span>`
+          : `<img data-offline-key="${item.content && item.content.startsWith('__offline__') ? item.content.replace('__offline__','') : ''}" src="${item.content && item.content.startsWith('__offline__') ? '' : item.content}" style="max-width:100%;display:block;flex:1;min-width:0;">`)
+        : `<span style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;flex:1;">${item.content||''}</span>`}
       ${item.date ? `<span style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:rgba(150,150,145,0.25);white-space:nowrap;flex-shrink:0;margin-top:0.2rem;">${item.date}</span>` : ''}
       <button onclick="deleteWhoIEntry(${item.id})" style="font-size:0.6rem;color:#ccc;border:none;background:none;cursor:pointer;flex-shrink:0;padding:0;line-height:1;">×</button>
     </div>`).join('');
+  setTimeout(function(){ if (typeof _resolveOfflineImages === 'function') _resolveOfflineImages(); }, 0);
 }
 
 function renderWhoIHistory() { renderWhoiGrid(); }
@@ -2329,11 +1984,16 @@ function renderWhoiWohGrid(fromStorage) {
   }
   el.innerHTML = dayItems.map(item => `
     <div style="display:flex;align-items:flex-start;gap:0.4rem;padding:0.25rem 0;">
-      <span style="color:var(--black);font-size:0.7rem;margin-top:0.15rem;flex-shrink:0;">•</span>
-      <span style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;flex:1;">${item.content||''}</span>
+      ${item.type === 'image' ? '<span style="flex-shrink:0;"></span>' : '<span style="color:var(--black);font-size:0.7rem;margin-top:0.15rem;flex-shrink:0;">•</span>'}
+      ${item.type === 'image'
+        ? (item.uploading
+          ? `<span style="font-family:'Nunito',sans-serif;font-size:0.7rem;color:var(--gray);flex:1;">Uploading...</span>`
+          : `<img data-offline-key="${item.content && item.content.startsWith('__offline__') ? item.content.replace('__offline__','') : ''}" src="${item.content && item.content.startsWith('__offline__') ? '' : item.content}" style="max-width:100%;display:block;flex:1;min-width:0;">`)
+        : `<span style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;flex:1;">${item.content||''}</span>`}
       ${item.date ? `<span style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:rgba(150,150,145,0.25);white-space:nowrap;flex-shrink:0;margin-top:0.2rem;">${item.date}</span>` : ''}
       <button onclick="deleteWhoiWohEntry(${item.id})" style="font-size:0.6rem;color:#ccc;border:none;background:none;cursor:pointer;flex-shrink:0;padding:0;line-height:1;">×</button>
     </div>`).join('');
+  setTimeout(function(){ if (typeof _resolveOfflineImages === 'function') _resolveOfflineImages(); }, 0);
 }
 
 // Schedule & Planner styles
@@ -3447,9 +3107,13 @@ function renderVisionBoard(fromStorage) {
     grid.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:Lora,serif;margin-top:0.5rem;">Your vision board is empty. Add a dream, a word, or an image 🤍</p>';
     return;
   }
+  var groupedItems = ['word','image','dream'].reduce(function(acc, t) {
+    return acc.concat(visionItems.filter(function(i){ return i.type === t; }));
+  }, []);
   grid.innerHTML = '<div class="vision-items-grid">'
-    + visionItems.map(function(item) {
-      return '<div style="border:1px solid #e8e8e5;padding:0.6rem;position:relative;">'
+    + groupedItems.map(function(item) {
+      var isDream = item.type === 'dream';
+      return '<div style="border:1px solid #e8e8e5;padding:0.6rem;position:relative;' + (isDream ? 'display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:6rem;' : '') + '">'
         + '<button onclick="removeVisionItem(' + item.id + ')" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;position:absolute;top:0.3rem;right:0.3rem;line-height:1;">✕</button>'
         + (item.type === 'image'
           ? item.uploading
@@ -3459,7 +3123,7 @@ function renderVisionBoard(fromStorage) {
             : '<img src="' + item.content + '" style="width:100%;display:block;border-radius:0;">')
           : item.type === 'word'
           ? '<div style="font-family:Lora,serif;font-style:italic;font-size:1rem;text-align:center;padding:0.5rem 0.5rem 0.2rem;">' + item.content + '</div>'
-          : '<div style="font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;padding-right:0.8rem;">' + item.content + '</div>'
+          : '<div style="font-family:Lora,serif;font-style:italic;font-size:1rem;line-height:1.5;text-align:center;padding:0.5rem 0.5rem 0.2rem;">' + item.content + '</div>'
         )
         + '<div style="font-family:Nunito,sans-serif;font-size:0.55rem;color:var(--gray);margin-top:0.3rem;">' + (item.date||'') + '</div>'
         + '</div>';
@@ -3913,7 +3577,6 @@ function reloadAllData() {
   beliefBeliefs = JSON.parse(localStorage.getItem('belief_beliefs') || '[]'); if (!Array.isArray(beliefBeliefs)) beliefBeliefs = [];
   userRituals = JSON.parse(localStorage.getItem('user_rituals') || '[]'); if (!Array.isArray(userRituals)) userRituals = [];
   ritualState = JSON.parse(localStorage.getItem('ritual_state') || '{}');
-  tgData = JSON.parse(localStorage.getItem('that_girl_data') || '{}');
   const di = JSON.parse(localStorage.getItem('dimension_items') || '{}'); dimensionItems = (di && typeof di === 'object' && !Array.isArray(di)) ? di : {};
   const ap = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); allPlannerData = (ap && typeof ap === 'object' && !Array.isArray(ap)) ? ap : {};
   const cl = JSON.parse(localStorage.getItem('cali_log') || '{}'); caliLog = (cl && typeof cl === 'object') ? cl : {};
@@ -3948,7 +3611,6 @@ function reloadAllData() {
   if (typeof jesusRenderStudyNotes === 'function') jesusRenderStudyNotes();
   if (typeof jesusRenderStudyQuestions === 'function') jesusRenderStudyQuestions();
   // Vision
-  if (typeof tgRenderAll === 'function' ) tgRenderAll();
   if (typeof renderWhoiDay === 'function') renderWhoiDay();
   if (typeof renderRituals === 'function') renderRituals();
   if (typeof initRituals === 'function') initRituals();
@@ -4514,7 +4176,7 @@ function belCheckinRender() {
 
 
 function showMeTab(tab) {
-  ['whiam','rightforme','assertive','believe','friends'].forEach(function(t) {
+  ['whiam','intj','me','assertive','believe','rightforme','friends'].forEach(function(t) {
     var el = document.getElementById('mesub-' + t);
     var btn = document.getElementById('metab-' + t);
     if (t === 'believe') {
@@ -4527,8 +4189,7 @@ function showMeTab(tab) {
   if (tab === 'assertive') { assCheckinRender(); belCheckinRender(); }
   if (tab === 'balance') { showMeTab('whiam'); setTimeout(function(){ wiaTab('balance'); initBalanceDatePicker(); renderBalanceQuestions(); renderRelationshipQuestions(); }, 50); return; }
   if (tab === 'assertive') { initAssertive(); initBelieve(); }
-  if (tab === 'rightforme') rfmRender();
-  if (tab === 'friends') friendsRender();
+  if (tab === 'intj') intjRender();
 }
 
 function initMeSection() {
@@ -5033,86 +4694,71 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- Me sub-tabs -->
   <div id="me-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
-    <button class="balance-sub-tab" onclick="showMeTab('rightforme')" id="metab-rightforme">Right For Me</button>
-    <button class="balance-sub-tab" onclick="showMeTab('friends')" id="metab-friends">Friends</button>
+    <button class="balance-sub-tab" onclick="showMeTab('intj')" id="metab-intj">INTJ and ME</button>
   </div>
 
   <!-- ME SUB-SECTIONS -->
     <div id="mesub-whiam">
-    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">You performed from every angle. Now you build from within.</div>
 
     <!-- IDENTITY -->
     <div class="wia-panel active" id="wia-identity">
-      <div class="wia-identity-card" style="margin-bottom:0.6rem;">
-        <div class="wia-id-label">I am</div>
-        <div class="wia-id-name" id="wiaIdName">...</div>
-        <div class="wia-id-traits" id="wiaIdTraits"></div>
-      </div>
-      <div style="margin-bottom:0.5rem;">
-        <div class="subtitle" style="margin-bottom:0.2rem;">How you see yourself</div>
-        <div style="display:flex;gap:0.5rem;align-items:center;">
-          <input type="text" id="wiaNameInput" placeholder="e.g. a person who..." style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;" onkeydown="if(event.key==='Enter'){wiaNameSave();this.blur();}" oninput="clearTimeout(window._wiaNameTimer);if(this.value.trim()){window._wiaNameTimer=setTimeout(wiaNameSave,1000);}else{WIA.name='';var _nd=document.getElementById('wiaIdName');if(_nd)_nd.textContent='';wiaSave();if(typeof syncToCloud==='function'){syncToCloud('wia2',WIA);}}">
+      <div style="border:1px solid #c8c8c5;padding:1.2rem;margin-bottom:0.75rem;">
+        <div class="wia-identity-card" style="padding:0 0 0.6rem;margin-bottom:0;text-align:center;min-height:110px;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+          <div class="wia-id-label">I am</div>
+          <div class="wia-id-name" id="wiaIdName">...</div>
+          <div class="wia-id-traits" id="wiaIdTraits" style="justify-content:center;"></div>
         </div>
-        <div id="wia-name-history" style="margin-top:0.6rem;"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.5rem;">
-        <div>
-          <div class="subtitle" style="margin-bottom:0.2rem;">Values</div>
-          <input type="text" id="wiaValueInput" placeholder="e.g. honesty, peace…" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;">
-          <div class="wia-tags-list" id="wiaValuesList" style="margin-top:0.3rem;"></div>
+
+        <div id="wia-type-panel-photo" style="display:none;margin-top:0.8rem;margin-bottom:0.8rem;">
+          <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;padding:0.3rem 0.7rem;display:inline-block;">
+            + Add Photo <input type="file" accept="image/*" onchange="wiaAddPhoto(this)" style="display:none;">
+          </label>
+          <div id="wia-photos-grid" class="vision-items-grid" style="margin-top:0.6rem;"></div>
         </div>
-        <div>
-          <div class="subtitle" style="margin-bottom:0.2rem;">Traits</div>
-          <input type="text" id="wiaTraitInput" placeholder="e.g. curious, caring…" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;">
-          <div class="wia-tags-list" id="wiaTraitsList" style="margin-top:0.3rem;"></div>
+
+        <hr style="border:none;border-top:1px solid #e8e8e5;margin:1.5rem 0;">
+        <div style="display:flex;gap:0.4rem;margin:1.5rem 0;flex-wrap:wrap;">
+          <button class="vision-type-btn active" id="wia-type-btn-self" onclick="wiaSetType('self',this)">How You See Yourself</button>
+          <button class="vision-type-btn" id="wia-type-btn-values" onclick="wiaSetType('values',this)">Values</button>
+          <button class="vision-type-btn" id="wia-type-btn-traits" onclick="wiaSetType('traits',this)">Traits</button>
+          <button class="vision-type-btn" id="wia-type-btn-photo" onclick="wiaSetType('photo',this)">Photo</button>
+        </div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:0.2rem 0.6rem;margin-bottom:2rem;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">
+          <div style="color:var(--black);">Values</div>
+          <div>the principles you want to live by (like honesty or freedom).</div>
+          <div style="color:var(--black);">Traits</div>
+          <div>the qualities others would use to describe you (like curious or kind).</div>
+        </div>
+
+        <div id="wia-type-panel-self" style="display:block;margin-bottom:0.5rem;">
+          <div class="subtitle" style="margin-bottom:0.3rem;">How You See Yourself</div>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <input type="text" id="wiaNameInput" placeholder="e.g. a person who..." onkeydown="if(event.key==='Enter'){wiaNameSave();this.blur();}" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
+            <button onclick="wiaNameSave()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
+          </div>
+          <div id="wia-name-history" style="margin-top:0.6rem;"></div>
+        </div>
+
+        <div id="wia-type-panel-values" style="display:none;margin-bottom:0.5rem;">
+          <div class="subtitle" style="margin-bottom:0.3rem;">Values</div>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <input type="text" id="wiaValueInput" placeholder="e.g. honesty, peace…" onkeydown="if(event.key==='Enter')wiaAddValue()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
+            <button onclick="wiaAddValue()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
+          </div>
+          <div class="wia-tags-list" id="wiaValuesList" style="margin-top:0.6rem;"></div>
+        </div>
+
+        <div id="wia-type-panel-traits" style="display:none;margin-bottom:0;">
+          <div class="subtitle" style="margin-bottom:0.3rem;">Traits</div>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <input type="text" id="wiaTraitInput" placeholder="e.g. curious, caring…" onkeydown="if(event.key==='Enter')wiaAddTrait()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
+            <button onclick="wiaAddTrait()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
+          </div>
+          <div class="wia-tags-list" id="wiaTraitsList" style="margin-top:0.6rem;"></div>
         </div>
       </div>
     </div>
 
-
-  <!-- Who I am -->
-  <hr style="margin:2.5rem 0;">
-  <div class="subtitle" style="margin-bottom:0.5rem;">Who I am</div>
-  <h2 style="margin-bottom:0.5rem;">Track your growth.</h2>
-  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Add words, thoughts, and pictures that reflect who you are 🤍</div>
-
-  <!-- Side-by-side two column layout — stacks on mobile -->
-  <style>
-    .whoi-two-col { display:flex; flex-wrap:nowrap; gap:0; min-height:300px; }
-    .whoi-two-col .whoi-divider { background:#c8c8c5; width:1px; flex-shrink:0; }
-    @media (max-width: 600px) {
-      .whoi-two-col { flex-direction:column; min-height:unset; }
-      .whoi-two-col .whoi-left { padding-right:0 !important; padding-bottom:1.2rem; border-bottom:1px solid #c8c8c5; }
-      .whoi-two-col .whoi-right { padding-left:0 !important; padding-top:1.2rem; }
-      .whoi-two-col .whoi-divider { display:none; }
-    }
-  </style>
-  <div class="whoi-two-col">
-
-    <!-- Left: Me with him/others -->
-    <div class="whoi-left" style="flex:1;min-width:0;padding-right:0.8rem;">
-      <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);margin-bottom:0.8rem;font-weight:400;">Me <mark style="background:#c8f0d0;padding:0 2px;">with him</mark>/others</div>
-      <div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.6rem;">
-        <input id="whoi-text-word" placeholder="Add something..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.2rem 0;">
-        <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.25rem 0.6rem;flex-shrink:0;">+</button>
-      </div>
-      <div id="whoi-grid"></div>
-    </div>
-
-    <!-- Divider -->
-    <div class="whoi-divider"></div>
-
-    <!-- Right: Me without him -->
-    <div class="whoi-right" style="flex:1;min-width:0;padding-left:0.8rem;">
-      <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);margin-bottom:0.8rem;font-weight:400;">Me <mark style="background:#ffd6e0;padding:0 2px;">without him</mark>/others</div>
-      <div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.6rem;">
-        <input id="whoiwoh-text-word" placeholder="Add something..." onkeydown="if(event.key==='Enter')addWhoiWohItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.2rem 0;">
-        <button onclick="addWhoiWohItem()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.25rem 0.6rem;flex-shrink:0;">+</button>
-      </div>
-      <div id="whoiwoh-grid"></div>
-    </div>
-
-  </div>
 
     <!-- PERFORM -->
     <div class="wia-panel" id="wia-perform">
@@ -5541,6 +5187,78 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 </div>
+    <!-- INTJ -->
+    <div id="mesub-intj" style="display:none;padding-top:1rem;">
+
+      <div style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">This Week</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;line-height:1.5;">Everything from this week, in one place.</div>
+      <div id="intj-calendar-grid" style="margin-bottom:1rem;"></div>
+      <div id="intj-day-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:9999;align-items:center;justify-content:center;padding:1.2rem;" onclick="if(event.target===this)intjCloseDayModal()">
+        <div style="background:#fff;max-width:360px;width:100%;padding:1.2rem;box-sizing:border-box;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
+            <div id="intj-day-modal-title" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);"></div>
+            <button onclick="intjCloseDayModal()" style="border:none;background:none;color:var(--gray);font-size:1.1rem;cursor:pointer;line-height:1;">✕</button>
+          </div>
+          <div id="intj-day-modal-hearts"></div>
+          <div id="intj-day-modal-extra"></div>
+          <button onclick="intjSaveDayModal()" style="margin-top:0.7rem;font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;">Save</button>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #e8e8e5;margin:1.8rem 0;">
+
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0 0 1.5rem;line-height:1.6;">Two different rhythms, one healthy life. Track time together, support your INTJ's needs, and make sure you're getting what you need too.</div>
+
+      <div style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Our Daily Schedule</div>
+      <div id="intj-schedule-list" style="margin-bottom:0.8rem;"></div>
+      <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+        <select id="intjScheduleHourInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;padding:0.45rem 0.5rem;color:var(--black);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;"></select>
+        <select id="intjScheduleMinInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;padding:0.45rem 0.5rem;color:var(--black);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;">
+          <option value="00">00</option>
+          <option value="15">15</option>
+          <option value="30">30</option>
+        </select>
+        <select id="intjScheduleAmPmInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;padding:0.45rem 0.5rem;color:var(--black);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;">
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </select>
+        <input type="text" id="intjScheduleTextInput" placeholder="e.g. Good morning message" onkeydown="if(event.key==='Enter')intjAddSchedule()" style="flex:1;min-width:140px;border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;outline:none;padding:0.45rem 0.6rem;color:var(--black);">
+        <div id="intj-who-btns" style="display:flex;gap:0.4rem;flex-shrink:0;">
+          <button class="vision-type-btn active" data-who="both" onclick="selectIntjWho(this)">Both</button>
+          <button class="vision-type-btn" data-who="intj" onclick="selectIntjWho(this)">My INTJ</button>
+          <button class="vision-type-btn" data-who="me" onclick="selectIntjWho(this)">Me</button>
+        </div>
+        <button onclick="intjAddSchedule()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #e8e8e5;margin:1.8rem 0;">
+
+
+      <div style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">This Week's Time</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;line-height:1.5;">Mark when you talked or connected each day, morning, noon, or evening.</div>
+      <div style="overflow-x:auto;margin-bottom:1rem;">
+        <table id="intj-week-table" style="width:100%;border-collapse:collapse;font-family:'Nunito',sans-serif;font-size:0.98rem;"></table>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #e8e8e5;margin:1.8rem 0;">
+
+      <div style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Ways I Can Support My INTJ</div>
+      <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.6rem;">
+        <input type="text" id="intjSupportIntjInput" placeholder="e.g. give advance notice for plans" onkeydown="if(event.key==='Enter')intjAddItem('supportIntj')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;outline:none;padding:0.3rem 0;">
+        <button onclick="intjAddItem('supportIntj')" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
+      </div>
+      <div id="intj-list-supportIntj"></div>
+
+      <hr style="border:none;border-top:1px solid #e8e8e5;margin:1.8rem 0;">
+
+      <div style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Ways I Need Support Too</div>
+      <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.6rem;">
+        <input type="text" id="intjSupportMeInput" placeholder="e.g. check in with words, not just actions" onkeydown="if(event.key==='Enter')intjAddItem('supportMe')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;outline:none;padding:0.3rem 0;">
+        <button onclick="intjAddItem('supportMe')" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
+      </div>
+      <div id="intj-list-supportMe"></div>
+    </div>
+
     <!-- FRIENDS -->
     <div id="mesub-friends" style="display:none;">
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">The people who make life feel like home.</div>
@@ -6302,10 +6020,10 @@ window.addEventListener('DOMContentLoaded', function() {
   <div id="jesus-cal-backdrop" onclick="toggleJesusCal()" style="display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.18);"></div>
 
   <!-- Sub-tabs -->
-  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-left:-1rem;margin-right:-1rem;padding-left:1rem;">
-    <button id="jtab-prayer" onclick="showJesusTab('prayer')" class="journal-tab active" style="flex:0 0 auto;white-space:nowrap;">Prayer</button>
-    <button id="jtab-study" onclick="showJesusTab('study')" class="journal-tab" style="flex:0 0 auto;white-space:nowrap;">Study the Bible</button>
-    <button id="jtab-action" onclick="showJesusTab('action')" class="journal-tab" style="flex:0 0 auto;white-space:nowrap;">Today's Action</button>
+  <div style="display:flex;gap:0;justify-content:center;border-bottom:1px solid #e8e8e5;margin-bottom:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+    <button id="jtab-prayer" onclick="showJesusTab('prayer')" class="journal-tab active" style="flex:1;white-space:nowrap;">Prayer</button>
+    <button id="jtab-study" onclick="showJesusTab('study')" class="journal-tab" style="flex:1;white-space:nowrap;">Study the Bible</button>
+    <button id="jtab-action" onclick="showJesusTab('action')" class="journal-tab" style="flex:1;white-space:nowrap;">Today's Action</button>
   </div>
 
   <!-- PRAYER & WORD -->
@@ -6358,40 +6076,53 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- TODAY'S ACTION -->
   <div id="jsub-action" style="display:none;">
 
-    <!-- Today's Action -->
-    <div id="jasub-action">
-      <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Today's Action</div>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.8rem;">What will you do today to walk in faith?</div>
-      <div id="jesus-action-list" style="margin-bottom:0.6rem;"></div>
-      <div style="display:flex;gap:0.5rem;">
-        <input id="jesus-action-input" placeholder="Add an action for today…" onkeydown="if(event.key==='Enter')jesusSaveAction()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.92rem;color:var(--black);outline:none;padding:0.3rem 0;">
+    <style>
+      .jesus-action-split { display:flex; gap:1.2rem; align-items:stretch; }
+      @media (max-width:768px) {
+        .jesus-action-split { flex-direction:column; gap:1.5rem; }
+      }
+    </style>
+
+    <div class="jesus-action-split">
+
+      <!-- Today's Action -->
+      <div id="jasub-action" style="flex:1;min-width:0;border:1px solid #e8e8e5;padding:1.2rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Today's Action</div>
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.8rem;">What will you do today to walk in faith?</div>
+        <div id="jesus-action-list" style="margin-bottom:0.6rem;"></div>
+        <div style="display:flex;gap:0.5rem;">
+          <input id="jesus-action-input" placeholder="Add an action for today…" onkeydown="if(event.key==='Enter')jesusSaveAction()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.92rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+        </div>
       </div>
-    </div>
 
-    <div style="border-top:1px solid #e8e8e5;margin-top:2rem;padding-top:2rem;">
-    <!-- Forgiveness -->
-    <div id="jasub-forgive">
-      <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Forgiveness</div>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.8rem;">Who do you need to forgive today?</div>
-      <div id="jesus-forgive-list" style="margin-bottom:0.6rem;"></div>
-      <input id="jesus-forgive-input" placeholder="I forgive…" onkeydown="if(event.key==='Enter')jesusSaveForgive()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.92rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
-    </div>
-    </div>
+      <!-- Forgiveness -->
+      <div id="jasub-forgive" style="flex:1;min-width:0;border:1px solid #e8e8e5;padding:1.2rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Forgiveness</div>
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.8rem;">Who do you need to forgive today?</div>
+        <div id="jesus-forgive-list" style="margin-bottom:0.6rem;"></div>
+        <input id="jesus-forgive-input" placeholder="I forgive…" onkeydown="if(event.key==='Enter')jesusSaveForgive()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.92rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+      </div>
 
-    <div style="border-top:1px solid #e8e8e5;margin-top:2rem;padding-top:2rem;">
-    <!-- Repentance -->
-    <div id="jasub-repent">
-      <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Repentance</div>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.8rem;">Bring it to Him. He is faithful and just to forgive. (1 John 1:9)</div>
-      <div id="jesus-repent-list" style="margin-bottom:0.6rem;"></div>
-      <input id="jesus-repent-input" placeholder="Lord, I repent of…" onkeydown="if(event.key==='Enter')jesusSaveRepent()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.92rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
-    </div>
+      <!-- Repentance -->
+      <div id="jasub-repent" style="flex:1;min-width:0;border:1px solid #e8e8e5;padding:1.2rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Repentance</div>
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.8rem;">Bring it to Him. He is faithful and just to forgive. (1 John 1:9)</div>
+        <div id="jesus-repent-list" style="margin-bottom:0.6rem;"></div>
+        <input id="jesus-repent-input" placeholder="Lord, I repent of…" onkeydown="if(event.key==='Enter')jesusSaveRepent()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.92rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+      </div>
+
     </div>
 
   </div>
 
   <!-- STUDY THE BIBLE -->
   <div id="jsub-study" style="display:none;">
+
+    <!-- Inner sub-tabs -->
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+      <button class="journal-tab active" id="jstab-notes" onclick="showJesusStudyTab('notes')">My Notes</button>
+      <button class="journal-tab" id="jstab-questions" onclick="showJesusStudyTab('questions')">My Questions</button>
+    </div>
 
     <!-- My Notes -->
     <div id="jssub-notes">
@@ -6400,7 +6131,7 @@ window.addEventListener('DOMContentLoaded', function() {
       <div style="border:1px solid #c8c8c5;padding:1rem;margin-bottom:1rem;">
         <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Read the Bible</div>
         <div style="display:flex;gap:0.5rem;margin-bottom:0.9rem;flex-wrap:wrap;">
-          <select id="jesus-bible-book" onchange="jesusBibleBookChanged()" style="flex:1;min-width:8rem;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:300;color:var(--black);outline:none;padding:0.35rem 0;"></select>
+          <select id="jesus-bible-book" onchange="jesusBibleBookChanged()" style="flex:1;min-width:8rem;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;color:var(--black);outline:none;padding:0.35rem 0;"></select>
           <select id="jesus-bible-chapter" style="width:5rem;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:300;color:var(--black);outline:none;padding:0.35rem 0;"></select>
           <button onclick="jesusLoadBibleChapter()" style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:var(--black);padding:0.45rem 0.9rem;cursor:pointer;">Go</button>
         </div>
@@ -6421,13 +6152,12 @@ window.addEventListener('DOMContentLoaded', function() {
         <button onclick="jesusSaveStudyNote()" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:var(--black);padding:0.5rem 1.2rem;cursor:pointer;">Save note</button>
         <div id="jesus-study-note-status" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;"></div>
       </div>
+    </div>
 
-      <!-- Questions (merged) -->
-      <div id="jssub-questions" style="margin-top:2rem;">
-        <div style="font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;">Questions you have for God, for the text, or about your faith.</div>
-        <div id="jesus-study-questions-list" style="margin-bottom:0.6rem;"></div>
-        <input id="jesus-study-question-input" placeholder="I want to understand…" onkeydown="if(event.key==='Enter')jesusSaveStudyQuestion()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
-      </div>
+    <!-- My Questions -->
+    <div id="jssub-questions" style="display:none;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;">Questions you have for God, for the text, or about your faith.</div>
+      <div id="jesus-study-questions-list" style="margin-bottom:0.6rem;"></div>
     </div>
 
   </div>
@@ -6757,6 +6487,12 @@ function jesusDeleteGodSaid(id) {
 }
 
 function showJesusStudyTab(tab) {
+  ['notes','questions'].forEach(function(t) {
+    var sub = document.getElementById('jssub-'+t);
+    if (sub) sub.style.display = t===tab?'block':'none';
+    var btn = document.getElementById('jstab-'+t);
+    if (btn) btn.classList.toggle('active', t===tab);
+  });
   jesusRenderStudyNotes(); jesusRenderStudyQuestions();
   if (typeof jesusPopulateBibleBooks === 'function') jesusPopulateBibleBooks();
 }
@@ -6967,12 +6703,39 @@ function jesusSaveStudyQuestion() {
   var inp = document.getElementById('jesus-study-question-input');
   var text = inp.value.trim(); if (!text) return;
   if (!jesusData.studyQuestions) jesusData.studyQuestions = [];
-  jesusData.studyQuestions.unshift({ id: Date.now(), text: text, answered: false, date: new Date().toISOString() });
+  jesusData.studyQuestions.push({ id: Date.now(), text: text, answered: false, date: new Date().toISOString() });
   inp.value = ''; jesusSave(); jesusRenderStudyQuestions(true); renderJesusCal();
 }
 function jesusToggleStudyQuestion(id) {
   jesusData.studyQuestions = (jesusData.studyQuestions||[]).map(function(x){ return x.id===id?{...x,answered:!x.answered}:x; });
   jesusSave(); jesusRenderStudyQuestions(true); renderJesusCal();
+}
+function jesusSaveQuestionAnswer(id, el) {
+  var text = el.value.trim();
+  jesusData.studyQuestions = (jesusData.studyQuestions||[]).map(function(x){
+    if (x.id !== id) return x;
+    return Object.assign({}, x, { answer: text, answered: text ? true : x.answered });
+  });
+  jesusSave(); jesusRenderStudyQuestions(true); renderJesusCal();
+}
+function jesusQuestionAnswerInput(id, el) {
+  var hasText = el.value.trim().length > 0;
+  var wasAnswered = (jesusData.studyQuestions||[]).some(function(x){ return x.id===id && x.answered; });
+  if (hasText === wasAnswered) return; // answered state hasn't changed, nothing to update
+  jesusData.studyQuestions = (jesusData.studyQuestions||[]).map(function(x){
+    if (x.id !== id) return x;
+    return Object.assign({}, x, { answered: hasText ? true : x.answered });
+  });
+  jesusSave();
+  var cursorPos = el.selectionStart;
+  jesusRenderStudyQuestions(true);
+  renderJesusCal();
+  // Restore focus + cursor position so typing isn't interrupted
+  var newEl = document.getElementById('jesus-q-answer-' + id);
+  if (newEl) {
+    newEl.focus();
+    try { newEl.setSelectionRange(cursorPos, cursorPos); } catch(e) {}
+  }
 }
 function jesusDeleteStudyQuestion(id) {
   jesusData.studyQuestions = (jesusData.studyQuestions||[]).filter(function(x){ return x.id!==id; });
@@ -6982,18 +6745,35 @@ function jesusRenderStudyQuestions(skipLoad) {
   if (!skipLoad) jesusLoad();
   var el = document.getElementById('jesus-study-questions-list'); if (!el) return;
   var items = jesusData.studyQuestions || [];
-  if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.88rem;color:#ccc;padding:0.3rem 0;">No questions yet.</div>'; return; }
-  el.innerHTML = items.map(function(x) {
-    var dl = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
+
+  var rows = items.map(function(x, idx) {
+    var answerVal = (x.answer || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
     return '<div style="padding:0.6rem 0;border-bottom:1px solid #f0f0ee;">' +
       '<div style="display:flex;align-items:center;gap:0.7rem;">' +
-        '<div onclick="jesusToggleStudyQuestion('+x.id+')" style="width:16px;height:16px;border:1px solid '+(x.answered?'var(--black)':'#c8c8c5')+';background:'+(x.answered?'var(--black)':'transparent')+';cursor:pointer;flex-shrink:0;"></div>' +
-        '<div style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--black);'+(x.answered?'text-decoration:line-through;color:var(--gray);':'')+'">'+x.text+'</div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.9rem;font-weight:300;color:var(--gray);flex-shrink:0;min-width:1.2em;">' + (idx+1) + '.</div>' +
+        '<div style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;font-style:italic;color:var(--black);'+(x.answered?'color:var(--gray);':'')+'">'+x.text+'</div>' +
+        (x.answered ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);flex-shrink:0;white-space:nowrap;">Answered</div>' : '') +
         '<button onclick="jesusDeleteStudyQuestion('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1.15rem;cursor:pointer;padding:0;flex-shrink:0;">\u00d7</button>' +
       '</div>' +
-      (dl ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.66rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;margin-top:0.25rem;padding-left:38px;">' + dl + '</div>' : '') +
+      '<div style="padding-left:38px;margin-top:0.35rem;">' +
+        '<input id="jesus-q-answer-'+x.id+'" value="'+answerVal+'" placeholder="Write the answer God gave you…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}" oninput="jesusQuestionAnswerInput('+x.id+',this)" onblur="jesusSaveQuestionAnswer('+x.id+',this)" style="width:100%;border:none;border-bottom:1px solid #eee;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--gray);outline:none;padding:0.2rem 0;box-sizing:border-box;">' +
+      '</div>' +
     '</div>';
   }).join('');
+
+  // Always-present trailing numbered row: the next number is already there,
+  // just type the question straight onto it.
+  var nextNum = items.length + 1;
+  var nextRow = '<div style="padding:0.6rem 0;">' +
+    '<div style="display:flex;align-items:center;gap:0.7rem;">' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.9rem;font-weight:300;color:var(--gray);flex-shrink:0;min-width:1.2em;">' + nextNum + '.</div>' +
+      '<div style="width:16px;flex-shrink:0;"></div>' +
+      '<input id="jesus-study-question-input" placeholder="I want to understand…" onkeydown="if(event.key===\'Enter\')jesusSaveStudyQuestion()" style="flex:1;border:none;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--black);outline:none;padding:0;">' +
+      '<div style="width:1.15rem;flex-shrink:0;"></div>' +
+    '</div>' +
+  '</div>';
+
+  el.innerHTML = rows + nextRow;
 }
 
 function showJesusPrayWordTab(tab) {
@@ -7119,9 +6899,10 @@ function jesusRenderCheckList(items, toggleFn, deleteFn) {
     var dateStr = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
     return '<div style="padding:0.5rem 0;border-bottom:1px solid #f0f0ee;">' +
       '<div style="display:flex;align-items:center;gap:0.6rem;">' +
+        '<div style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.92rem;font-weight:300;color:var(--black);'+(x.done?'color:var(--gray);':'')+'">' + x.text + '</div>' +
         '<div onclick="'+toggleFn+'('+x.id+')" style="width:14px;height:14px;border:1px solid '+(x.done?'var(--black)':'#c8c8c5')+';background:'+(x.done?'var(--black)':'transparent')+';cursor:pointer;flex-shrink:0;"></div>' +
-        '<div style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);'+(x.done?'text-decoration:line-through;color:var(--gray);':'')+'">' + x.text + '</div>' +
-        '<button onclick="'+deleteFn+'('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;">×</button>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);flex-shrink:0;white-space:nowrap;min-width:2.8em;visibility:'+(x.done?'visible':'hidden')+';">Done</div>' +
+        '<button onclick="'+deleteFn+'('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;margin-left:0.4rem;">×</button>' +
       '</div>' +
       (dateStr ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;margin-top:0.2rem;padding-left:20px;">' + dateStr + '</div>' : '') +
     '</div>';
@@ -7256,36 +7037,18 @@ function showHabitsTab(tab) {
 function showSchedMainTab(tab) {
   var ms = document.getElementById('schmain-schedule');
   var mh = document.getElementById('schmain-habits');
-  var mr = document.getElementById('schmain-routine');
   var mri = document.getElementById('schmain-rhythminfp');
   var ts = document.getElementById('schtab-schedule');
   var th = document.getElementById('schtab-habits');
-  var tr = document.getElementById('schtab-routine');
   var tri = document.getElementById('schtab-rhythminfp');
   if (ms) ms.style.display = tab === 'schedule' ? 'block' : 'none';
   if (mh) mh.style.display = tab === 'habits' ? 'block' : 'none';
-  if (mr) mr.style.display = tab === 'routine' ? 'block' : 'none';
   if (mri) mri.style.display = tab === 'rhythminfp' ? 'block' : 'none';
   if (ts) { ts.style.color = tab === 'schedule' ? 'var(--black)' : 'var(--gray)'; ts.style.borderBottom = tab === 'schedule' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (th) { th.style.color = tab === 'habits' ? 'var(--black)' : 'var(--gray)'; th.style.borderBottom = tab === 'habits' ? '2px solid var(--black)' : '2px solid transparent'; }
-  if (tr) { tr.style.color = tab === 'routine' ? 'var(--black)' : 'var(--gray)'; tr.style.borderBottom = tab === 'routine' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (tri) { tri.style.color = tab === 'rhythminfp' ? 'var(--black)' : 'var(--gray)'; tri.style.borderBottom = tab === 'rhythminfp' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (tab === 'habits') showSchedHabitsTab('calisthenics');
-  if (tab === 'routine') routineInit();
-  if (tab === 'rhythminfp') { showRhythmInfpTab('rhythm'); }
-}
-
-function showRhythmInfpTab(sub) {
-  var rDiv = document.getElementById('schmain-rhythm');
-  var iDiv = document.getElementById('schmain-infp');
-  var rBtn = document.getElementById('ritab-rhythm');
-  var iBtn = document.getElementById('ritab-infp');
-  if (rDiv) rDiv.style.display = sub === 'rhythm' ? 'block' : 'none';
-  if (iDiv) iDiv.style.display = sub === 'infp' ? 'block' : 'none';
-  if (rBtn) { rBtn.style.color = sub === 'rhythm' ? 'var(--black)' : 'var(--gray)'; rBtn.style.borderBottom = sub === 'rhythm' ? '2px solid var(--black)' : '2px solid transparent'; }
-  if (iBtn) { iBtn.style.color = sub === 'infp' ? 'var(--black)' : 'var(--gray)'; iBtn.style.borderBottom = sub === 'infp' ? '2px solid var(--black)' : '2px solid transparent'; }
-  if (sub === 'rhythm') rhythmLoad();
-  if (sub === 'infp') infpLoad();
+  if (tab === 'rhythminfp') { infpLoad(); }
 }
 
 function showSchedHabitsTab(tab) {
@@ -8915,8 +8678,6 @@ function wiaTab(id) {
 function initWhiAm() {
   if (_wiaInited) return;
   _wiaInited = true;
-  var ni = document.getElementById('wiaNameInput');
-  if (ni) ni.value = WIA.name;
   var _vi = document.getElementById('wiaValueInput'); if (_vi) _vi.addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddValue(); });
   var _ti = document.getElementById('wiaTraitInput'); if (_ti) _ti.addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddTrait(); });
   var _qa = document.getElementById('wiaQAns'); if (_qa) _qa.addEventListener('input', function() { WIA.j[wiaQi] = this.value; wiaSave(); wiaRenderQ(); });
@@ -8930,13 +8691,7 @@ function initWhiAm() {
 
 // IDENTITY
 function wiaUpdateCard() {
-  var nameEl = document.getElementById('wiaNameInput');
-  // Only restore input from data when user is NOT typing in it
-  if (nameEl && document.activeElement !== nameEl) {
-    nameEl.value = WIA.name || '';
-  }
-  var nameDisp = document.getElementById('wiaIdName');
-  if (nameDisp) nameDisp.textContent = (WIA.name && WIA.name.trim()) ? WIA.name : '';
+  wiaRenderIdNames();
   var traitsEl = document.getElementById('wiaIdTraits');
   if (traitsEl) {
     var all = WIA.traits.concat(WIA.values).filter(function(t){ return t && t.trim(); });
@@ -8945,6 +8700,19 @@ function wiaUpdateCard() {
       : '';
   }
   wiaRenderNameHistory();
+  wiaRenderPhotos();
+}
+function wiaRenderIdNames() {
+  var nameDisp = document.getElementById('wiaIdName');
+  if (!nameDisp) return;
+  var history = WIA.nameHistory || [];
+  if (!history.length) {
+    nameDisp.innerHTML = (WIA.name && WIA.name.trim()) ? WIA.name : '...';
+    return;
+  }
+  nameDisp.innerHTML = history.map(function(entry) {
+    return '<div>' + entry.text + '</div>';
+  }).join('');
 }
 function wiaUpdateCardAndSave() {
   var nameEl = document.getElementById('wiaNameInput');
@@ -8953,18 +8721,81 @@ function wiaUpdateCardAndSave() {
   if (nameDisp) nameDisp.textContent = WIA.name || '';
   wiaSave();
 }
+
+// I am — photo gallery
+let wiaPhotos = JSON.parse(localStorage.getItem('wia_photos') || '[]');
+if (!Array.isArray(wiaPhotos)) wiaPhotos = [];
+
+async function wiaAddPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const tempId = Date.now();
+  wiaPhotos.unshift({ id: tempId, content: '', date, uploading: true });
+  wiaRenderPhotos(false);
+  try {
+    const url = await uploadImageToCloud(file);
+    const idx = wiaPhotos.findIndex(function(i){ return i.id === tempId; });
+    if (idx !== -1) {
+      wiaPhotos[idx].content = url;
+      wiaPhotos[idx].uploading = false;
+      if (url.startsWith('__offline__')) wiaPhotos[idx].pendingUpload = true;
+    }
+    localStorage.setItem('wia_photos', JSON.stringify(wiaPhotos));
+    if (typeof syncToCloud === 'function' && !url.startsWith('__offline__')) syncToCloud('wia_photos', wiaPhotos);
+  } catch(e) {
+    const idx2 = wiaPhotos.findIndex(function(i){ return i.id === tempId; });
+    if (idx2 !== -1) wiaPhotos.splice(idx2, 1);
+  }
+  input.value = '';
+  wiaRenderPhotos(false);
+}
+
+function wiaDeletePhoto(id) {
+  wiaPhotos = wiaPhotos.filter(function(i){ return i.id !== id; });
+  localStorage.setItem('wia_photos', JSON.stringify(wiaPhotos));
+  if (typeof syncToCloud === 'function') syncToCloud('wia_photos', wiaPhotos);
+  wiaRenderPhotos(false);
+}
+
+function wiaRenderPhotos(fromStorage) {
+  if (fromStorage !== false) {
+    try { var _f = localStorage.getItem('wia_photos'); if (_f) { wiaPhotos = JSON.parse(_f); if (!Array.isArray(wiaPhotos)) wiaPhotos = []; } } catch(e) {}
+  }
+  var el = document.getElementById('wia-photos-grid');
+  if (!el) return;
+  el.innerHTML = wiaPhotos.map(function(item) {
+    return '<div style="border:1px solid #e8e8e5;padding:0.6rem;position:relative;">'
+      + '<button onclick="wiaDeletePhoto(' + item.id + ')" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;position:absolute;top:0.3rem;right:0.3rem;line-height:1;">✕</button>'
+      + (item.uploading
+        ? '<div style="font-family:Nunito,sans-serif;font-size:0.7rem;color:var(--gray);text-align:center;padding:1rem 0;">Uploading...</div>'
+        : (item.content.startsWith('__offline__')
+          ? '<img data-offline-key="' + item.content.replace('__offline__','') + '" src="" style="width:100%;display:block;min-height:80px;background:#f0f0ee;">'
+          : '<img src="' + item.content + '" style="width:100%;display:block;">'))
+      + '</div>';
+  }).join('');
+  setTimeout(function(){ if (typeof _resolveOfflineImages === 'function') _resolveOfflineImages(); }, 0);
+}
+function wiaSetType(type, btn) {
+  ['self','values','traits','photo'].forEach(function(t) {
+    var panel = document.getElementById('wia-type-panel-' + t);
+    var b = document.getElementById('wia-type-btn-' + t);
+    if (panel) panel.style.display = (t === type) ? 'block' : 'none';
+    if (b) b.classList.toggle('active', t === type);
+  });
+}
 function wiaNameSave() {
   var nameEl = document.getElementById('wiaNameInput');
   if (!nameEl) return;
   var val = nameEl.value.trim();
   if (!val) return;
   if (!Array.isArray(WIA.nameHistory)) WIA.nameHistory = [];
-  if (WIA.nameHistory.length && WIA.nameHistory[0].text === val) return;
+  if (WIA.nameHistory.length && WIA.nameHistory[0].text === val) { nameEl.value = ''; return; }
   WIA.name = val;
-  var nameDisp = document.getElementById('wiaIdName');
-  if (nameDisp) nameDisp.textContent = WIA.name;
   WIA.nameHistory.unshift({ text: val, savedAt: new Date().toISOString() });
+  nameEl.value = '';
   wiaSave();
+  wiaRenderIdNames();
   wiaRenderNameHistory();
 }
 function wiaRenderNameHistory() {
@@ -8986,14 +8817,11 @@ function wiaRenderNameHistory() {
   }).join('');
 }
 function wiaDeleteNameEntry(i) {
-  if (!Array.isArray(WIA.nameHistory)) return;
+  if (!Array.isArray(WIA.nameHistory)) WIA.nameHistory = [];
   WIA.nameHistory.splice(i, 1);
-  if (WIA.nameHistory.length > 0) {
-    WIA.name = WIA.nameHistory[0].text;
-    var nameDisp = document.getElementById('wiaIdName');
-    if (nameDisp) nameDisp.textContent = WIA.name;
-  }
+  WIA.name = WIA.nameHistory.length > 0 ? WIA.nameHistory[0].text : '';
   wiaSave();
+  wiaRenderIdNames();
   wiaRenderNameHistory();
 }
 function wiaRenderValues() {
@@ -12242,6 +12070,426 @@ function rhythmDeleteTagItem(elId, namespace, idx) {
       rhythmRenderTagList(elId, rhythmData.years[yr][yType], namespace);
     }
   }
+}
+
+// -- INTJ ---------------------------------------------------------
+var INTJ_DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+var INTJ_DEFAULT_SCHEDULE = [
+  { time: '8:00 AM',  text: 'Good morning message', who: 'both' },
+  { time: '12:30 PM', text: 'Lunch — check in, even briefly', who: 'both' },
+  { time: '1:00 PM',  text: 'Deep work / focus block, no interruptions', who: 'intj' },
+  { time: '6:30 PM',  text: 'Dinner together', who: 'both' },
+  { time: '8:00 PM',  text: 'Quiet wind-down / recharge time', who: 'intj' },
+  { time: '8:30 PM',  text: 'Time to talk, connect, be heard', who: 'me' },
+  { time: '9:30 PM',  text: 'Goodnight message', who: 'both' }
+];
+var intjData = JSON.parse(localStorage.getItem('intj_data') || 'null') || {
+  week: {}, supportIntj: [], supportMe: [], checkins: [], schedule: null
+};
+if (!intjData.week) intjData.week = {};
+if (!intjData.supportIntj) intjData.supportIntj = [];
+if (!intjData.supportMe) intjData.supportMe = [];
+if (!intjData.checkins) intjData.checkins = [];
+if (!intjData.weekNotes) intjData.weekNotes = {};
+if (!Array.isArray(intjData.schedule)) intjData.schedule = INTJ_DEFAULT_SCHEDULE.slice();
+
+function intjSave() {
+  localStorage.setItem('intj_data', JSON.stringify(intjData));
+  if (typeof syncToCloud === 'function') syncToCloud('intj_data', intjData);
+}
+
+function intjRender() {
+  intjInitScheduleHourOptions();
+  intjRenderSchedule();
+  intjRenderWeek();
+  intjRenderCalendar();
+  intjRenderList('supportIntj');
+  intjRenderList('supportMe');
+  intjRenderCheckins();
+}
+
+function intjWhoLabel(who) {
+  if (who === 'intj') return 'My INTJ';
+  if (who === 'me') return 'Me';
+  return 'Both';
+}
+
+function intjTimeToMinutes(t) {
+  if (!t) return 9999;
+  var m = t.trim().match(/^(\d{1,2}):?(\d{2})?\s*(AM|PM|am|pm)?/);
+  if (!m) return 9999;
+  var h = parseInt(m[1], 10);
+  var min = m[2] ? parseInt(m[2], 10) : 0;
+  var ap = m[3] ? m[3].toUpperCase() : null;
+  if (ap === 'PM' && h !== 12) h += 12;
+  if (ap === 'AM' && h === 12) h = 0;
+  return h * 60 + min;
+}
+
+function intjRenderSchedule() {
+  var el = document.getElementById('intj-schedule-list');
+  if (!el) return;
+  var items = intjData.schedule.map(function(item, i) { return { item: item, i: i }; });
+  items.sort(function(a, b) { return intjTimeToMinutes(a.item.time) - intjTimeToMinutes(b.item.time); });
+  if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.98rem;color:var(--gray);padding:0.4rem 0;">Nothing scheduled yet.</div>'; return; }
+  el.innerHTML = '<div style="display:flex;flex-direction:column;gap:0.1rem;">' + items.map(function(entry) {
+    var item = entry.item, i = entry.i;
+    return '<div style="border:none;padding:0.3rem 0.7rem;position:relative;">'
+      + '<div style="position:absolute;top:0.4rem;right:0.4rem;display:flex;align-items:center;gap:0.8rem;">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:2px 7px;">' + intjWhoLabel(item.who) + '</div>'
+      + '<button onclick="intjDeleteSchedule(' + i + ')" style="font-size:0.6rem;color:var(--gray);border:none;background:none;cursor:pointer;line-height:1;">✕</button>'
+      + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;font-weight:300;color:var(--black);line-height:1.4;padding-right:5rem;">' + (item.time ? '<span style="font-size:0.82rem;">' + item.time + '</span> - ' : '') + item.text + '</div>'
+      + '</div>';
+  }).join('') + '</div>';
+}
+
+function intjInitScheduleHourOptions() {
+  var hourSel = document.getElementById('intjScheduleHourInput');
+  if (!hourSel || hourSel.options.length) return;
+  for (var h = 1; h <= 12; h++) {
+    var opt = document.createElement('option');
+    opt.value = String(h);
+    opt.textContent = String(h);
+    hourSel.appendChild(opt);
+  }
+}
+
+var currentIntjWho = 'both';
+
+function selectIntjWho(btn) {
+  currentIntjWho = btn.dataset.who || btn.getAttribute('data-who') || 'both';
+  document.querySelectorAll('#intj-who-btns .vision-type-btn').forEach(function(b) {
+    b.classList.toggle('active', b === btn);
+  });
+}
+
+function intjAddSchedule() {
+  intjInitScheduleHourOptions();
+  var hourInp = document.getElementById('intjScheduleHourInput');
+  var minInp = document.getElementById('intjScheduleMinInput');
+  var ampmInp = document.getElementById('intjScheduleAmPmInput');
+  var textInp = document.getElementById('intjScheduleTextInput');
+  if (!textInp) return;
+  var text = textInp.value.trim();
+  if (!text) return;
+  var time = (hourInp && minInp && ampmInp) ? (hourInp.value + ':' + minInp.value + ' ' + ampmInp.value) : '';
+  var who = currentIntjWho || 'both';
+  intjData.schedule.push({ time: time, text: text, who: who });
+  textInp.value = '';
+  intjSave();
+  intjRenderSchedule();
+}
+
+function intjDeleteSchedule(i) {
+  intjData.schedule.splice(i, 1);
+  intjSave();
+  intjRenderSchedule();
+}
+
+function intjRenderWeek() {
+  var table = document.getElementById('intj-week-table');
+  if (!table) return;
+  var dates = intjGetWeekDates();
+  var rowsHtml = '<tr><td style="padding:0.4rem 0.3rem;"></td>' + INTJ_DAYS.map(function(d){
+    return '<td style="text-align:center;padding:0.4rem 0.3rem;color:var(--gray);letter-spacing:0.05em;text-transform:uppercase;font-size:0.62rem;">' + d + '</td>';
+  }).join('') + '</tr>';
+
+  ['morning','noon','evening'].forEach(function(type) {
+    var label = type.charAt(0).toUpperCase() + type.slice(1);
+    rowsHtml += '<tr><td style="padding:0.4rem 0.3rem;color:var(--black);white-space:nowrap;text-transform:uppercase;letter-spacing:0.05em;font-size:0.72rem;">' + label + '</td>' + INTJ_DAYS.map(function(d, di) {
+      var checked = (intjData.week[d] && intjData.week[d][type]) ? true : false;
+      var dateObj = dates[di];
+      var key = intjDateKey(dateObj);
+      var dateLabel = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+      return '<td style="text-align:center;padding:0.4rem 0.3rem;">'
+        + '<span onclick="intjOpenDayModal(\'' + key + '\',\'' + dateLabel + '\')" style="cursor:pointer;display:inline-block;line-height:1;">'
+        + '<svg width="12" height="12" viewBox="0 0 24 24" style="display:block;"><path d="M12 21s-7.5-4.6-10.2-9.1C0.1 8.9 1 5.3 4.2 4.1 6.6 3.2 9 4.1 12 7c3-2.9 5.4-3.8 7.8-2.9 3.2 1.2 4.1 4.8 2.4 7.8C19.5 16.4 12 21 12 21z" fill="' + (checked ? 'var(--black)' : 'none') + '" stroke="' + (checked ? 'var(--black)' : '#ccc') + '" stroke-width="1.3"/></svg>'
+        + '</span>'
+        + '</td>';
+    }).join('') + '</tr>';
+  });
+
+  table.innerHTML = rowsHtml;
+}
+
+function intjToggleDay(day, type) {
+  if (!intjData.week[day]) intjData.week[day] = {};
+  intjData.week[day][type] = !intjData.week[day][type];
+  intjSave();
+  intjRenderCalendar();
+}
+
+function intjGetWeekDates() {
+  var today = new Date();
+  var dow = today.getDay();
+  var mondayOffset = dow === 0 ? -6 : 1 - dow;
+  var monday = new Date(today);
+  monday.setDate(today.getDate() + mondayOffset);
+  var dates = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    dates.push(d);
+  }
+  return dates;
+}
+
+function intjDateKey(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function intjHeartIcon(checked) {
+  return '<svg width="9" height="9" viewBox="0 0 24 24" style="display:inline-block;margin-right:2px;"><path d="M12 21s-7.5-4.6-10.2-9.1C0.1 8.9 1 5.3 4.2 4.1 6.6 3.2 9 4.1 12 7c3-2.9 5.4-3.8 7.8-2.9 3.2 1.2 4.1 4.8 2.4 7.8C19.5 16.4 12 21 12 21z" fill="' + (checked ? 'var(--black)' : 'none') + '" stroke="' + (checked ? 'var(--black)' : '#ccc') + '" stroke-width="1.5"/></svg>';
+}
+
+function intjSectionLabel(text) {
+  return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin:1.2rem 0 0.5rem;">' + text + '</div>';
+}
+
+function intjEmptyRow(text) {
+  return '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.9rem;color:var(--gray);padding:0.25rem 0;">' + text + '</div>';
+}
+
+function intjRenderCalendar() {
+  var el = document.getElementById('intj-calendar-grid');
+  if (!el) return;
+  var todayKey = intjDateKey(new Date());
+  var dates = intjGetWeekDates();
+
+  var daysHtml = dates.map(function(d, idx) {
+    var dayAbbr = INTJ_DAYS[idx];
+    var key = intjDateKey(d);
+    var dayNotes = (intjData.weekNotes && intjData.weekNotes[key]) || {};
+    if (typeof dayNotes === 'string') dayNotes = { evening: dayNotes };
+    var wk = intjData.week[dayAbbr] || {};
+    var periods = ['morning', 'noon', 'evening'].filter(function(p) { return wk[p]; });
+    var periodsLabel = periods.map(function(p) { return p.charAt(0).toUpperCase() + p.slice(1); }).join(', ');
+    var noteText = ['morning', 'noon', 'evening'].map(function(p) {
+      if (!dayNotes[p]) return '';
+      var label = p.charAt(0).toUpperCase() + p.slice(1);
+      return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--black);line-height:1.6;margin-top:0.3rem;"><span style="color:var(--gray);">' + label + ':</span> ' + dayNotes[p] + '</div>';
+    }).join('');
+    var isToday = key === todayKey;
+    var dateLabel = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    return '<div style="padding:1.3rem 0;border-bottom:1px solid #f0f0ee;">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.66rem;letter-spacing:0.07em;text-transform:uppercase;color:' + (isToday ? 'var(--black)' : 'var(--gray)') + ';">' + dateLabel + (isToday ? ' - Today' : '') + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;margin-top:0.2rem;display:flex;align-items:center;gap:0.4rem;">' + (periods.length ? (intjHeartIcon(true) + '<span style="color:var(--black);">Connected</span><span style="color:var(--gray);"> - ' + periodsLabel + '</span>') : '<span style="color:var(--gray);">No connection logged</span>') + '</div>'
+      + noteText
+      + '</div>';
+  }).join('');
+
+  var supportIntjHtml = (intjData.supportIntj && intjData.supportIntj.length)
+    ? intjData.supportIntj.map(function(item) {
+        return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:' + (item.done ? 'var(--gray)' : 'var(--black)') + ';padding:0.2rem 0;display:flex;align-items:center;gap:0.4rem;">' + intjHeartIcon(!!item.done) + '<span>' + item.text + '</span></div>';
+      }).join('')
+    : intjEmptyRow('Nothing added yet.');
+
+  var supportMeHtml = (intjData.supportMe && intjData.supportMe.length)
+    ? intjData.supportMe.map(function(item) {
+        return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:' + (item.done ? 'var(--gray)' : 'var(--black)') + ';padding:0.2rem 0;display:flex;align-items:center;gap:0.4rem;">' + intjHeartIcon(!!item.done) + '<span>' + item.text + '</span></div>';
+      }).join('')
+    : intjEmptyRow('Nothing added yet.');
+
+  var weekStart = new Date(dates[0].getFullYear(), dates[0].getMonth(), dates[0].getDate());
+  var weekEnd = new Date(dates[6].getFullYear(), dates[6].getMonth(), dates[6].getDate(), 23, 59, 59, 999);
+  var checkinsThisWeek = (intjData.checkins || []).filter(function(c) {
+    if (!c.savedAt) return false;
+    var d = new Date(c.savedAt);
+    return d >= weekStart && d <= weekEnd;
+  });
+  var checkinsHtml = checkinsThisWeek.length
+    ? checkinsThisWeek.map(function(c) {
+        var d = new Date(c.savedAt);
+        var dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:var(--black);padding:0.2rem 0;display:flex;align-items:center;gap:0.4rem;">' + intjHeartIcon(true) + '<span>' + c.text + ' <span style="color:var(--gray);font-size:0.68rem;">(' + dateStr + ')</span></span></div>';
+      }).join('')
+    : intjEmptyRow('No check-ins logged this week yet.');
+
+  el.innerHTML = daysHtml
+    + intjSectionLabel('Ways I Can Support My INTJ') + supportIntjHtml
+    + intjSectionLabel('Ways I Need Support Too') + supportMeHtml;
+}
+
+var _intjModalKey = null;
+var _intjModalDayAbbr = null;
+
+function intjModalPeriodRow(period, label, dayAbbr, checked, noteVal) {
+  var escaped = (noteVal || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return '<div style="display:flex;align-items:flex-start;gap:0.6rem;margin-bottom:0.8rem;">'
+    + '<span onclick="intjModalToggleHeart(\'' + period + '\')" style="cursor:pointer;margin-top:0.15rem;flex-shrink:0;">' + intjHeartIcon(checked) + '</span>'
+    + '<div style="flex:1;">'
+    + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-bottom:0.25rem;">' + label + '</div>'
+    + '<textarea id="intj-day-modal-note-' + period + '" placeholder="What happened…" rows="2" style="width:100%;border:none;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;outline:none;padding:0.25rem 0;box-sizing:border-box;resize:vertical;line-height:1.5;overflow-wrap:break-word;">' + escaped + '</textarea>'
+    + '</div>'
+    + '</div>';
+}
+
+function intjModalScheduleHtml(dayAbbr) {
+  var items = (intjData.schedule || []).slice().sort(function(a, b) { return intjTimeToMinutes(a.time) - intjTimeToMinutes(b.time); });
+  if (!items.length) return '';
+  var rows = items.map(function(item) {
+    return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);padding:0.2rem 0;">'
+      + '<span style="font-size:0.68rem;">' + (item.time || '') + '</span> - ' + item.text
+      + ' <span style="font-size:0.55rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray);">(' + intjWhoLabel(item.who) + ')</span>'
+      + '</div>';
+  }).join('');
+  return '<div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid #f0f0ee;">'
+    + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Your Schedule That Day</div>'
+    + rows + '</div>';
+}
+
+function intjModalCheckinsHtml(key) {
+  var matches = (intjData.checkins || []).filter(function(c) {
+    return c.savedAt && c.savedAt.slice(0, 10) === key;
+  });
+  if (!matches.length) return '';
+  var rows = matches.map(function(c) {
+    return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);padding:0.2rem 0;">' + c.text + '</div>';
+  }).join('');
+  return '<div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid #f0f0ee;">'
+    + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Check-Ins Logged That Day</div>'
+    + rows + '</div>';
+}
+
+function intjRenderDayModal() {
+  var key = _intjModalKey, dayAbbr = _intjModalDayAbbr;
+  var wk = intjData.week[dayAbbr] || {};
+  var dayNotes = (intjData.weekNotes && intjData.weekNotes[key]) || {};
+  if (typeof dayNotes === 'string') dayNotes = { morning: '', noon: '', evening: dayNotes };
+  document.getElementById('intj-day-modal-hearts').innerHTML =
+    intjModalPeriodRow('morning', 'Morning', dayAbbr, !!wk.morning, dayNotes.morning)
+    + intjModalPeriodRow('noon', 'Noon', dayAbbr, !!wk.noon, dayNotes.noon)
+    + intjModalPeriodRow('evening', 'Evening', dayAbbr, !!wk.evening, dayNotes.evening);
+  document.getElementById('intj-day-modal-extra').innerHTML =
+    intjModalCheckinsHtml(key);
+}
+
+function intjModalToggleHeart(period) {
+  if (!_intjModalDayAbbr) return;
+  if (!intjData.week[_intjModalDayAbbr]) intjData.week[_intjModalDayAbbr] = {};
+  intjData.week[_intjModalDayAbbr][period] = !intjData.week[_intjModalDayAbbr][period];
+  intjSave();
+  intjRenderWeek();
+  intjRenderDayModal();
+  intjRenderCalendar();
+}
+
+function intjOpenDayModal(key, dateLabel) {
+  _intjModalKey = key;
+  _intjModalDayAbbr = INTJ_DAYS[(new Date(key + 'T00:00:00').getDay() + 6) % 7];
+  document.getElementById('intj-day-modal-title').textContent = dateLabel;
+  intjRenderDayModal();
+  document.getElementById('intj-day-modal').style.display = 'flex';
+}
+
+function intjCloseDayModal() {
+  document.getElementById('intj-day-modal').style.display = 'none';
+  _intjModalKey = null;
+  _intjModalDayAbbr = null;
+}
+
+function intjSaveDayModal() {
+  if (!_intjModalKey) return;
+  if (!intjData.weekNotes) intjData.weekNotes = {};
+  intjData.weekNotes[_intjModalKey] = {
+    morning: (document.getElementById('intj-day-modal-note-morning') || {}).value || '',
+    noon: (document.getElementById('intj-day-modal-note-noon') || {}).value || '',
+    evening: (document.getElementById('intj-day-modal-note-evening') || {}).value || ''
+  };
+  intjSave();
+  intjRenderCalendar();
+  intjCloseDayModal();
+}
+
+function intjSavePeriodNote(key, period, value) {
+  if (!intjData.weekNotes) intjData.weekNotes = {};
+  var existing = intjData.weekNotes[key];
+  if (!existing || typeof existing === 'string') existing = { morning: '', noon: '', evening: '' };
+  existing[period] = value;
+  intjData.weekNotes[key] = existing;
+  intjSave();
+  intjRenderCalendar();
+}
+
+function intjAddItem(key) {
+  var inputId = key === 'supportIntj' ? 'intjSupportIntjInput' : 'intjSupportMeInput';
+  var inp = document.getElementById(inputId);
+  if (!inp) return;
+  var val = inp.value.trim();
+  if (!val) return;
+  intjData[key].push({ text: val, done: false });
+  inp.value = '';
+  intjSave();
+  intjRenderList(key);
+  intjRenderCalendar();
+}
+
+function intjToggleItem(key, i) {
+  if (!intjData[key][i]) return;
+  intjData[key][i].done = !intjData[key][i].done;
+  intjSave();
+  intjRenderList(key);
+  intjRenderCalendar();
+}
+
+function intjDeleteItem(key, i) {
+  intjData[key].splice(i, 1);
+  intjSave();
+  intjRenderList(key);
+  intjRenderCalendar();
+}
+
+function intjRenderList(key) {
+  var el = document.getElementById('intj-list-' + key);
+  if (!el) return;
+  var items = intjData[key];
+  if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.98rem;color:var(--gray);padding:0.4rem 0;">Nothing added yet.</div>'; return; }
+  el.innerHTML = items.map(function(item, i) {
+    return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
+      + '<div style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--black);' + (item.done ? 'color:var(--gray);' : '') + '">' + item.text + '</div>'
+      + '<div onclick="intjToggleItem(\'' + key + '\',' + i + ')" style="width:14px;height:14px;border:1px solid ' + (item.done ? 'var(--black)' : '#c8c8c5') + ';background:' + (item.done ? 'var(--black)' : 'transparent') + ';cursor:pointer;flex-shrink:0;"></div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);flex-shrink:0;white-space:nowrap;min-width:2.8em;visibility:' + (item.done ? 'visible' : 'hidden') + ';">Done</div>'
+      + '<button onclick="intjDeleteItem(\'' + key + '\',' + i + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:0.85rem;padding:0;line-height:1;flex-shrink:0;">×</button>'
+      + '</div>';
+  }).join('');
+}
+
+function intjAddCheckin() {
+  var inp = document.getElementById('intjCheckinInput');
+  if (!inp) return;
+  var val = inp.value.trim();
+  if (!val) return;
+  intjData.checkins.unshift({ text: val, savedAt: new Date().toISOString() });
+  inp.value = '';
+  intjSave();
+  intjRenderCheckins();
+  intjRenderCalendar();
+}
+
+function intjDeleteCheckin(i) {
+  intjData.checkins.splice(i, 1);
+  intjSave();
+  intjRenderCheckins();
+  intjRenderCalendar();
+}
+
+function intjRenderCheckins() {
+  var el = document.getElementById('intj-checkin-history');
+  if (!el) return;
+  var history = intjData.checkins;
+  if (!history.length) { el.innerHTML = ''; return; }
+  el.innerHTML = history.map(function(entry, i) {
+    var d = new Date(entry.savedAt);
+    var dateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    return '<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
+      + '<div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--black);line-height:1.5;">' + entry.text + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;color:#bbb;margin-top:0.1rem;">' + dateStr + '</div>'
+      + '</div>'
+      + '<button onclick="intjDeleteCheckin(' + i + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:0.85rem;padding:0;line-height:1;margin-left:0.5rem;flex-shrink:0;">×</button>'
+      + '</div>';
+  }).join('');
 }
 </script>
 
