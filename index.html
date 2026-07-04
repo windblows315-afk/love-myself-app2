@@ -582,8 +582,8 @@
     body { overflow-x: hidden; line-height: 1.7; }
     nav { padding: 0.8rem 1.2rem 0; gap: 0.4rem; }
     .logo { font-size: 1.1rem; }
-    .nav-tab { font-size: 0.82rem; letter-spacing: 0.01em; white-space: nowrap; }
-    .nav-tabs { justify-content: flex-start; padding: 0 0.1rem; }
+    .nav-tab { font-size: 0.62rem; letter-spacing: 0; white-space: nowrap; }
+    .nav-tabs { justify-content: space-between; overflow-x: visible; gap: 0.35rem; padding: 0; }
     .section { padding: 1.5rem 1.2rem 8rem; }
     h1 { font-size: 1.5rem; margin-bottom: 0.6rem; }
     h2 { font-size: 0.95rem; margin-bottom: 0.8rem; }
@@ -611,12 +611,15 @@
     .journal-content { font-size: 0.9rem; }
     .balance-sub-tab { font-size: 0.58rem; padding: 0.45rem 0.4rem 0.5rem; letter-spacing: 0.03em; flex: 0 0 50%; min-width: 0; white-space: nowrap; text-align: center; }
     .journal-nav-tab { flex: 1 !important; }
-    #me-subtab-row .balance-sub-tab { flex: 0 0 50%; border-bottom: 1px solid #e8e8e5; }
+    #me-subtab-row { justify-content: space-between; overflow-x: visible; }
+    #me-subtab-row .balance-sub-tab { flex: 1; border-bottom: 1px solid #e8e8e5; font-size: 0.5rem; letter-spacing: 0.01em; padding: 0.4rem 0.15rem 0.5rem; white-space: normal; line-height: 1.25; }
     #me-subtab-row .balance-sub-tab.active { border-bottom: 2px solid var(--black); }
     #asstab-understand, #asstab-asking, #asstab-giving, #asstab-practice { flex: 0 0 50%; border-bottom: 1px solid #e8e8e5; }
     [id^="asstab-"] { flex: 0 0 50% !important; }
     .assertive-inner-tabs { flex-wrap: wrap !important; }
     .journal-tab { font-size: 0.62rem; padding: 0.45rem 0.6rem 0.5rem; letter-spacing: 0.04em; flex: 0 0 auto; }
+    #jesus-subtabs { justify-content: space-between; overflow-x: visible; }
+    #jesus-subtabs .journal-tab { flex: 1 !important; font-size: 0.56rem; padding: 0.45rem 0.2rem 0.5rem; letter-spacing: 0.01em; white-space: normal; line-height: 1.25; }
     .wia-tab { font-size: 0.54rem; padding: 5px 4px; letter-spacing: 0.05em; flex: 1; }
     .home-card { padding: 0.9rem; }
     .home-card-text { font-size: 0.9rem; }
@@ -6216,7 +6219,7 @@ window.addEventListener('DOMContentLoaded', function() {
   <div id="jesus-cal-backdrop" onclick="toggleJesusCal()" style="display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.18);"></div>
 
   <!-- Sub-tabs -->
-  <div style="display:flex;gap:0;justify-content:center;border-bottom:1px solid #e8e8e5;margin-bottom:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+  <div id="jesus-subtabs" style="display:flex;gap:0;justify-content:center;border-bottom:1px solid #e8e8e5;margin-bottom:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;">
     <button id="jtab-prayer" onclick="showJesusTab('prayer')" class="journal-tab active" style="flex:1;white-space:nowrap;">Prayer</button>
     <button id="jtab-study" onclick="showJesusTab('study')" class="journal-tab" style="flex:1;white-space:nowrap;">Study the Bible</button>
     <button id="jtab-action" onclick="showJesusTab('action')" class="journal-tab" style="flex:1;white-space:nowrap;">Today's Action</button>
