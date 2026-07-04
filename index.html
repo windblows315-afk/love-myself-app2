@@ -996,27 +996,11 @@ window.addEventListener('error', function(e) {
         <div style="border:1px solid #c8c8c5;padding:0.8rem;">
           <div class="planner-label">Mood</div>
           <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😊')">😊</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😔')">😔</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😰')">😰</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😡')">😡</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🥰')">🥰</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😴')">😴</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😐')">😐</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🥺')">🥺</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😭')">😭</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🤩')">🤩</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😌')">😌</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🤗')">🤗</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😶')">😶</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🥱')">🥱</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😇')">😇</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🤯')">🤯</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'💪')">💪</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🔥')">🔥</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😞')">😞</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🥹')">🥹</span>
-            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😤')">😤</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'Great')">Great</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'Good')">Good</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'Okay')">Okay</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'Low')">Low</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'Not Great')">Not Great</span>
           </div>
         </div>
 
@@ -1047,6 +1031,21 @@ window.addEventListener('error', function(e) {
             <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-5" onclick="schedDailyToggleWater(this,5)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">3 PM</span></div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-6" onclick="schedDailyToggleWater(this,6)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">5 PM</span></div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-7" onclick="schedDailyToggleWater(this,7)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">7 PM</span></div>
+          </div>
+        </div>
+
+        <!-- Exercise -->
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div class="planner-label">Exercise</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
+            <span class="exercise-btn" onclick="schedDailyToggleExercise(this,'Cardio')">Cardio</span>
+            <span class="exercise-btn" onclick="schedDailyToggleExercise(this,'Strength')">Strength</span>
+            <span class="exercise-btn" onclick="schedDailyToggleExercise(this,'Yoga')">Yoga</span>
+            <span class="exercise-btn" onclick="schedDailyToggleExercise(this,'Walk')">Walk</span>
+            <span class="exercise-btn" onclick="schedDailyToggleExercise(this,'Stretch')">Stretch</span>
+            <span class="exercise-btn" onclick="schedDailyToggleExercise(this,'Dance')">Dance</span>
+            <span class="exercise-btn" onclick="schedDailyToggleExercise(this,'Calisthenics')">Calisthenics</span>
+            <span class="exercise-btn" onclick="schedDailyToggleExercise(this,'Rest Day')">Rest Day</span>
           </div>
         </div>
 
@@ -1920,8 +1919,8 @@ const scheduleStyle = document.createElement('style');
 scheduleStyle.textContent = `
   .planner-label { font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gray); }
   .planner-textarea { width:100%; border:none; border-bottom:1px solid #e8e8e5; background:transparent; font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:var(--black); outline:none; resize:none; padding:0.3rem 0; line-height:1.5; }
-  .mood-btn { font-size:1.2rem; cursor:pointer; opacity:0.35; transition:opacity 0.15s; }
-  .mood-btn.selected { opacity:1; }
+  .mood-btn { font-family:'Nunito',sans-serif; font-size:0.65rem; letter-spacing:0.04em; border:1px solid #c8c8c5; padding:0.3rem 0.5rem; border-radius:12px; cursor:pointer; color:var(--gray); background:none; transition:all 0.15s; text-align:center; }
+  .mood-btn.selected { background:var(--black); color:var(--white); border-color:var(--black); }
   .sleep-btn { font-family:'Nunito',sans-serif; font-size:0.65rem; border:1px solid #c8c8c5; width:24px; height:24px; border-radius:50%; cursor:pointer; color:var(--gray); background:none; transition:all 0.15s; display:inline-flex; align-items:center; justify-content:center; padding:0; }
   .sleep-btn.selected { background:var(--black); color:var(--white); border-color:var(--black); }
   .water-cup { font-size:1rem; cursor:pointer; opacity:0.25; transition:opacity 0.15s; }
@@ -4248,7 +4247,7 @@ function showMeTab(tab) {
   if (tab === 'infp') { if (typeof infpLoad === 'function') infpLoad(); }
   var _meHeaders = {
     whiam: { subtitle: 'Get to know you', title: 'Who I am.', desc: 'Everything that makes you, you 🤍' },
-    infp: { subtitle: 'Your inner world matters', title: 'INFP.', desc: 'A quiet space for feelings, needs, and creativity 🤍' },
+    infp: { subtitle: 'Your inner world matters', title: 'INFP and INTJ.', desc: 'A quiet space for feelings, needs, and creativity 🤍' },
     intj: { subtitle: 'Understand your mind', title: 'INTJ and me.', desc: 'How your personality shows up in daily life 🤍' }
   };
   if (_meHeaders[tab]) {
@@ -4767,7 +4766,7 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- Me sub-tabs -->
   <div id="me-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
-    <button class="balance-sub-tab" onclick="showMeTab('infp')" id="metab-infp">INFP</button>
+    <button class="balance-sub-tab" onclick="showMeTab('infp')" id="metab-infp">INFP and INTJ</button>
     <button class="balance-sub-tab" onclick="showMeTab('intj')" id="metab-intj">INTJ and ME</button>
   </div>
 
@@ -5264,7 +5263,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
   <!-- INFP -->
   <div id="mesub-infp" style="display:none;margin-top:1.5rem;">
-    <div class="subtitle" style="margin-bottom:0.5rem;">INFP</div>
+    <div class="subtitle" style="margin-bottom:0.5rem;">INFP and INTJ</div>
     <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Your inner world matters. 🤍</div>
 
     <!-- Track Days toggle -->
@@ -5289,6 +5288,94 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;font-weight:300;color:var(--gray);text-align:center;margin-top:2rem;">Tap a day 🤍</div>
         </div>
       </div>
+    </div>
+
+    <!-- Who We Are -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label" style="text-align:center;margin-bottom:0.6rem;">Who We Are</div>
+      <div style="display:flex;gap:0;">
+        <div style="flex:1;min-width:0;padding-right:0.7rem;border-right:1px solid #e8e8e5;">
+          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.72rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">Me</div>
+          <textarea id="infp-whoiam" placeholder="Who am I, right now: my personality, my values, what makes me, me..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;"></textarea>
+          <div style="margin-top:0.4rem;text-align:center;">
+            <button onclick="infpSaveEntry('whoiam')" style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.22rem 0.6rem;cursor:pointer;">Save</button>
+          </div>
+          <div id="infp-whoiam-entries" style="margin-top:0.6rem;"></div>
+          <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
+            <div style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
+            <textarea id="infp-whoiamnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;"></textarea>
+            <div style="text-align:center;">
+              <button onclick="infpSaveEntry('whoiamnotes')" style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.18rem 0.5rem;cursor:pointer;">Save</button>
+            </div>
+            <div id="infp-whoiamnotes-entries" style="margin-top:0.4rem;"></div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0;padding-left:0.7rem;">
+          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.72rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">Him</div>
+          <textarea id="infp-whoheis" placeholder="Who is he, right now: his personality, his values, what makes him, him..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;"></textarea>
+          <div style="margin-top:0.4rem;text-align:center;">
+            <button onclick="infpSaveEntry('whoheis')" style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.22rem 0.6rem;cursor:pointer;">Save</button>
+          </div>
+          <div id="infp-whoheis-entries" style="margin-top:0.6rem;"></div>
+          <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
+            <div style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
+            <textarea id="infp-whoheisnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;"></textarea>
+            <div style="text-align:center;">
+              <button onclick="infpSaveEntry('whoheisnotes')" style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.18rem 0.5rem;cursor:pointer;">Save</button>
+            </div>
+            <div id="infp-whoheisnotes-entries" style="margin-top:0.4rem;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Our Problems & Traumas -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label" style="text-align:center;margin-bottom:0.6rem;">Our Problems & Traumas</div>
+      <div style="display:flex;gap:0;">
+        <div style="flex:1;min-width:0;padding-right:0.7rem;border-right:1px solid #e8e8e5;">
+          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.72rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">Mine</div>
+          <textarea id="infp-problems" placeholder="What am I carrying: my patterns, wounds, or triggers..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;"></textarea>
+          <div style="margin-top:0.4rem;text-align:center;">
+            <button onclick="infpSaveEntry('problems')" style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.22rem 0.6rem;cursor:pointer;">Save</button>
+          </div>
+          <div id="infp-problems-entries" style="margin-top:0.6rem;"></div>
+          <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
+            <div style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
+            <textarea id="infp-problemsnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;"></textarea>
+            <div style="text-align:center;">
+              <button onclick="infpSaveEntry('problemsnotes')" style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.18rem 0.5rem;cursor:pointer;">Save</button>
+            </div>
+            <div id="infp-problemsnotes-entries" style="margin-top:0.4rem;"></div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0;padding-left:0.7rem;">
+          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.72rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">His</div>
+          <textarea id="infp-problemshis" placeholder="What is he carrying: his patterns, wounds, or triggers..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;"></textarea>
+          <div style="margin-top:0.4rem;text-align:center;">
+            <button onclick="infpSaveEntry('problemshis')" style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.22rem 0.6rem;cursor:pointer;">Save</button>
+          </div>
+          <div id="infp-problemshis-entries" style="margin-top:0.6rem;"></div>
+          <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
+            <div style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
+            <textarea id="infp-problemshisnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;"></textarea>
+            <div style="text-align:center;">
+              <button onclick="infpSaveEntry('problemshisnotes')" style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.18rem 0.5rem;cursor:pointer;">Save</button>
+            </div>
+            <div id="infp-problemshisnotes-entries" style="margin-top:0.4rem;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How We Can Solve It -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">How We Can Solve It</div>
+      <textarea id="infp-solutions" placeholder="What could help? What are we willing to try, ask for, or change..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
+      <div style="margin-top:0.4rem;">
+        <button onclick="infpSaveEntry('solutions')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+      </div>
+      <div id="infp-solutions-entries" style="margin-top:0.6rem;"></div>
     </div>
 
     <!-- Notes -->
@@ -6018,27 +6105,11 @@ window.addEventListener('DOMContentLoaded', function() {
         <div style="border:1px solid #c8c8c5;padding:0.8rem;">
           <div class="planner-label">Mood</div>
           <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
-            <span class="mood-btn" onclick="dailyToggleMood(this,'😊')">😊</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'😔')">😔</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'😰')">😰</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'😡')">😡</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'🥰')">🥰</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'😴')">😴</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'😐')">😐</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'🥺')">🥺</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'😤')">😤</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'😭')">😭</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'🤩')">🤩</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'😌')">😌</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'🤗')">🤗</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'😶')">😶</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'🥱')">🥱</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'😇')">😇</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'🤯')">🤯</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'💪')">💪</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'🔥')">🔥</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'😞')">😞</span>
-            <span class="mood-btn" onclick="dailyToggleMood(this,'🥹')">🥹</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'Great')">Great</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'Good')">Good</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'Okay')">Okay</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'Low')">Low</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'Not Great')">Not Great</span>
           </div>
         </div>
 
@@ -7453,7 +7524,8 @@ function dailyTodayKey() {
 
 function dailyGetToday() {
   var k = dailyTodayKey();
-  if (!dailyData[k]) dailyData[k] = { mood: [], sleep: null, water: [false,false,false,false,false,false,false,false], meals: {} };
+  if (!dailyData[k]) dailyData[k] = { mood: [], sleep: null, water: [false,false,false,false,false,false,false,false], exercise: [], meals: {} };
+  if (!dailyData[k].exercise) dailyData[k].exercise = [];
   return dailyData[k];
 }
 
@@ -7469,8 +7541,20 @@ function dailySaveAll() {
 function schedDailyGetToday() {
   var k = new Date().toISOString().split('T')[0];
   try { var d = localStorage.getItem('daily_data'); if (d) dailyData = JSON.parse(d); } catch(e) {}
-  if (!dailyData[k]) dailyData[k] = { mood: [], sleep: null, water: [false,false,false,false,false,false,false,false], meals: {} };
+  if (!dailyData[k]) dailyData[k] = { mood: [], sleep: null, water: [false,false,false,false,false,false,false,false], exercise: [], meals: {} };
+  if (!dailyData[k].exercise) dailyData[k].exercise = [];
   return dailyData[k];
+}
+
+function schedDailyToggleExercise(btn, label) {
+  var today = schedDailyGetToday();
+  if (!today.exercise) today.exercise = [];
+  var idx = today.exercise.indexOf(label);
+  if (idx === -1) today.exercise.push(label); else today.exercise.splice(idx, 1);
+  btn.classList.toggle('selected', today.exercise.indexOf(label) !== -1);
+  localStorage.setItem('daily_data', JSON.stringify(dailyData));
+  if (window.syncToCloud) window.syncToCloud('daily_data', dailyData);
+  if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
 }
 
 function schedDailyLoadUI() {
@@ -7488,6 +7572,10 @@ function schedDailyLoadUI() {
     var cup = document.getElementById('sched-water-' + i);
     if (cup) cup.style.opacity = (today.water && today.water[i]) ? '1' : '0.3';
   }
+  // Exercise
+  document.querySelectorAll('#ps-daily .exercise-btn').forEach(function(btn) {
+    btn.classList.toggle('selected', today.exercise && today.exercise.indexOf(btn.textContent) !== -1);
+  });
   // Meals
   schedDailyRenderMeals();
 }
@@ -7538,12 +7626,14 @@ function schedDailyRemoveMeal(meal, i) {
   if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
 }
 
-function schedDailyToggleMood(btn, emoji) {
+function schedDailyToggleMood(btn, level) {
   var today = schedDailyGetToday();
-  if (!today.mood) today.mood = [];
-  var idx = today.mood.indexOf(emoji);
-  if (idx === -1) today.mood.push(emoji); else today.mood.splice(idx, 1);
-  btn.classList.toggle('selected', today.mood.indexOf(emoji) !== -1);
+  var already = (today.mood || []).indexOf(level) !== -1;
+  today.mood = already ? [] : [level];
+  var group = btn.parentElement;
+  if (group) group.querySelectorAll('.mood-btn').forEach(function(b) {
+    b.classList.toggle('selected', today.mood.indexOf(b.textContent) !== -1);
+  });
   localStorage.setItem('daily_data', JSON.stringify(dailyData));
   if (window.syncToCloud) window.syncToCloud('daily_data', dailyData);
   // Sync habits daily panel
@@ -7597,11 +7687,14 @@ function dailyLoad() {
   dailyRenderMeals();
 }
 
-function dailyToggleMood(btn, emoji) {
+function dailyToggleMood(btn, level) {
   var today = dailyGetToday();
-  var idx = today.mood.indexOf(emoji);
-  if (idx === -1) today.mood.push(emoji); else today.mood.splice(idx,1);
-  btn.classList.toggle('selected', today.mood.indexOf(emoji) !== -1);
+  var already = (today.mood || []).indexOf(level) !== -1;
+  today.mood = already ? [] : [level];
+  var group = btn.parentElement;
+  if (group) group.querySelectorAll('.mood-btn').forEach(function(b) {
+    b.classList.toggle('selected', today.mood.indexOf(b.textContent) !== -1);
+  });
   dailySaveAll();
 }
 
@@ -10554,6 +10647,15 @@ function infpLoad() {
   infpRenderPhotos('creative');
   infpRenderEntries('notes');
   infpRenderEntries('creative');
+  infpRenderEntries('whoiam');
+  infpRenderEntries('whoheis');
+  infpRenderEntries('problems');
+  infpRenderEntries('problemshis');
+  infpRenderEntries('solutions');
+  infpRenderEntries('whoiamnotes');
+  infpRenderEntries('whoheisnotes');
+  infpRenderEntries('problemsnotes');
+  infpRenderEntries('problemshisnotes');
 }
 
 function infpSave() {
