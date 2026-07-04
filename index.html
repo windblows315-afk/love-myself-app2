@@ -524,7 +524,7 @@
   body { background: var(--white); color: var(--black); font-family: 'Nunito', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
   nav { width: 100%; max-width: 680px; display: flex; flex-direction: column; align-items: flex-start; padding: 1.5rem 1.5rem 0; gap: 0.8rem; }
   .logo { font-size: 1.5rem; letter-spacing: 0.12em; font-weight: 300; text-transform: lowercase; }
-  .nav-tabs { display: flex; gap: 0; flex-wrap: nowrap; overflow-x: auto; justify-content: space-between; width: 100%; -webkit-overflow-scrolling: touch; }
+  .nav-tabs { display: flex; gap: 1.4rem; flex-wrap: nowrap; overflow-x: auto; justify-content: center; width: 100%; -webkit-overflow-scrolling: touch; }
   .nav-tabs::-webkit-scrollbar { display: none; }
   .nav-tab { font-family: 'Nunito', sans-serif; font-size: 1.1rem; letter-spacing: 0.03em; text-transform: uppercase; cursor: pointer; color: var(--gray); border: none; background: none; padding: 0.25rem 0; border-bottom: 1px solid transparent; transition: color 0.2s, border-color 0.2s; white-space: nowrap; }
   .nav-tab.active, .nav-tab:hover { color: var(--black); border-bottom-color: var(--black); }
@@ -726,7 +726,7 @@
   .wia-panel.active { display:block; }
   .wia-identity-card { background:transparent; border:none; padding:1rem 0; margin-bottom:0.8rem; position:relative; overflow:hidden; }
   .wia-identity-card::after { content:''; }
-  .wia-id-label { font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:300; color:var(--gray); margin-bottom:6px; }
+  .wia-id-label { font-family:'Nunito',sans-serif; font-size:0.85rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:300; color:var(--gray); margin-bottom:6px; }
   .wia-id-name { font-family:'Lora',serif; font-size:1.2rem; font-weight:300; color:var(--black); margin-bottom:1rem; font-style:italic; min-height:28px; }
   .wia-id-name div { margin-bottom:0.3rem; }
   .wia-id-name div:last-child { margin-bottom:0; }
@@ -857,10 +857,8 @@ window.addEventListener('error', function(e) {
       <div class="home-card" style="cursor:default;">
         <div class="home-card-title">Journal</div>
         <div class="home-card-links">
-          <div class="home-link" onclick="showSection('journal');setTimeout(()=>showJournalTab('belief'),100)">Belief</div>
           <div class="home-link" onclick="showSection('journal');setTimeout(()=>showJournalTab('vent'),100)">Journal</div>
-          <div class="home-link" onclick="showSection('journal');setTimeout(()=>showJournalTab('books'),100)">Books</div>
-          <div class="home-link last" onclick="showSection('journal');setTimeout(()=>showJournalTab('wins'),100)">Wins</div>
+          <div class="home-link last" onclick="showSection('journal');setTimeout(()=>showJournalTab('books'),100)">Books</div>
         </div>
       </div>
 
@@ -944,7 +942,6 @@ window.addEventListener('error', function(e) {
   <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.2rem;">
     <button id="schtab-schedule" onclick="showSchedMainTab('schedule')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid var(--black);font-weight:300;">Daily Schedule</button>
     <button id="schtab-habits" onclick="showSchedMainTab('habits')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Calisthenics</button>
-    <button id="schtab-rhythminfp" onclick="showSchedMainTab('rhythminfp')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">INFP</button>
 
   </div>
 
@@ -1163,85 +1160,6 @@ window.addEventListener('error', function(e) {
     <div id="schhabits-rest" style="display:none;"></div>
   </div>
 
-  <!-- RHYTHM & INFP COMBINED TAB -->
-  <div id="schmain-rhythminfp" style="display:none;">
-
-  <!-- INFP TAB -->
-  <div id="schmain-infp">
-    <div class="subtitle" style="margin-bottom:0.5rem;">INFP</div>
-    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Your inner world matters. 🤍</div>
-
-    <!-- Track Days toggle -->
-    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;cursor:pointer;" onclick="infpToggleCal()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-      <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Track Days</span>
-    </div>
-
-    <!-- Track Days calendar -->
-    <div id="infp-cal-wrap" style="display:none;margin-bottom:1.2rem;border:1px solid #e8e8e5;">
-      <div style="display:flex;min-height:200px;">
-        <div style="width:50%;min-width:0;border-right:1px solid #e8e8e5;padding:0.5rem;box-sizing:border-box;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;">
-            <button onclick="infpCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8249;</button>
-            <div id="infp-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.48rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);text-align:center;"></div>
-            <button onclick="infpCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8250;</button>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;" id="infp-cal-daynames"></div>
-          <div id="infp-cal-grid"></div>
-        </div>
-        <div id="infp-cal-day-view" style="width:50%;min-width:0;padding:0.6rem;box-sizing:border-box;overflow-y:auto;max-height:300px;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;font-weight:300;color:var(--gray);text-align:center;margin-top:2rem;">Tap a day 🤍</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Notes -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">Notes & Reflections</div>
-      <textarea id="infp-notes" placeholder="Write your thoughts, feelings, ideas..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
-      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
-        <button onclick="infpSaveEntry('notes')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
-        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
-          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('notes',this)" style="display:none;">
-        </label>
-      </div>
-      <div id="infp-notes-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
-      <div id="infp-notes-entries" style="margin-top:0.6rem;"></div>
-    </div>
-
-    <!-- Things I'm feeling -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">Things I'm Feeling</div>
-      <div id="infp-feelings-list" style="margin-top:0.5rem;"></div>
-      <input id="infp-feelings-input" placeholder="Add a feeling..." onkeydown="if(event.key==='Enter')infpAddFeeling()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-    </div>
-
-    <!-- Things I need -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">Things I Need Today</div>
-      <div id="infp-needs-list" style="margin-top:0.5rem;"></div>
-      <input id="infp-needs-input" placeholder="Add something you need..." onkeydown="if(event.key==='Enter')infpAddNeed()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-    </div>
-
-    <!-- Creative space -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">Creative Space</div>
-      <textarea id="infp-creative" placeholder="A dream, a story, a poem, an idea..." style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.88rem;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.8;color:var(--black);"></textarea>
-      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
-        <button onclick="infpSaveEntry('creative')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
-        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
-          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('creative',this)" style="display:none;">
-        </label>
-      </div>
-      <div id="infp-creative-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
-      <div id="infp-creative-entries" style="margin-top:0.6rem;"></div>
-    </div>
-  </div>
-
-
-
-  </div><!-- end schmain-rhythminfp -->
-
   <!-- Copy schedule picker -->
   <div id="copy-schedule-box" style="display:none;border:1px solid #c8c8c5;padding:1rem;margin-top:0.6rem;">
     <div class="planner-label" style="margin-bottom:0.6rem;">Copy this day's schedule to:</div>
@@ -1359,7 +1277,7 @@ function showSection(id){
   if (id === 'schedule') { try { initScheduleDatePicker(); } catch(e) {} loadPlannerDay(); }
   if (id === 'vision') { renderVisionBoard(true); }
   if (id === 'me') { initMeSection(); initWhiAm(); showMeTab('whiam'); }
-  if (id === 'journal') { showJournalTab('belief'); }
+  if (id === 'journal') { showJournalTab('vent'); }
   if (id === 'jesus' && typeof jesusInit === 'function') jesusInit();
 }
 
@@ -1623,7 +1541,7 @@ function renderWins() {
   const dayWins = wins.filter(w => w.dateKey === dateKey || (!w.dateKey && w.date && w.date.includes(new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}))));
 
   if (!dayWins.length) {
-    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">No wins for this day yet 🤍</p>';
+    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.78rem;font-family:\'Lora\',serif;">No wins for this day yet 🤍</p>';
     return;
   }
   el.innerHTML = dayWins.map(w => `
@@ -4005,16 +3923,16 @@ function showMeJournalTab(tab) {
 }
 
 function showJournalTab(tab) {
-  ['belief','wins','vent','books'].forEach(function(t) {
+  // 'belief' and 'wins' are kept as aliases for 'vent' since all three now live in one combined view
+  if (tab === 'belief' || tab === 'wins') tab = 'vent';
+  ['vent','books'].forEach(function(t) {
     var el = document.getElementById('jsub-' + t);
     var btn = document.getElementById('jtabn-' + t);
     if (el) el.style.display = t === tab ? 'block' : 'none';
     if (btn) btn.classList.toggle('active', t === tab);
   });
-  if (tab === 'wins') { renderWins(); }
-  if (tab === 'vent') { renderVentEntries(); loadVentDay(); }
+  if (tab === 'vent') { renderVentEntries(); loadVentDay(); renderWins(); beliefRenderAll(); }
   if (tab === 'books') { renderBooks(); }
-  if (tab === 'belief') { beliefRenderAll(); }
 }
 
 function showMeMainTab(tab) {
@@ -4024,7 +3942,7 @@ function showMeMainTab(tab) {
     if (el) el.style.display = t === tab ? 'block' : 'none';
     if (btn) btn.classList.toggle('active', t === tab);
   });
-  if (tab === 'journal') { showJournalTab('belief'); }
+  if (tab === 'journal') { showJournalTab('vent'); }
   if (tab === 'me') showMeTab('whiam');
 }
 
@@ -4176,7 +4094,7 @@ function belCheckinRender() {
 
 
 function showMeTab(tab) {
-  ['whiam','intj','me','assertive','believe','rightforme','friends'].forEach(function(t) {
+  ['whiam','infp','intj','me','assertive','believe','rightforme','friends'].forEach(function(t) {
     var el = document.getElementById('mesub-' + t);
     var btn = document.getElementById('metab-' + t);
     if (t === 'believe') {
@@ -4190,6 +4108,20 @@ function showMeTab(tab) {
   if (tab === 'balance') { showMeTab('whiam'); setTimeout(function(){ wiaTab('balance'); initBalanceDatePicker(); renderBalanceQuestions(); renderRelationshipQuestions(); }, 50); return; }
   if (tab === 'assertive') { initAssertive(); initBelieve(); }
   if (tab === 'intj') intjRender();
+  if (tab === 'infp') { if (typeof infpLoad === 'function') infpLoad(); }
+  var _meHeaders = {
+    whiam: { subtitle: 'Get to know you', title: 'Who I am.', desc: 'Everything that makes you, you 🤍' },
+    infp: { subtitle: 'Your inner world matters', title: 'INFP.', desc: 'A quiet space for feelings, needs, and creativity 🤍' },
+    intj: { subtitle: 'Understand your mind', title: 'INTJ and me.', desc: 'How your personality shows up in daily life 🤍' }
+  };
+  if (_meHeaders[tab]) {
+    var _stEl = document.getElementById('me-header-subtitle');
+    var _ttEl = document.getElementById('me-header-title');
+    var _dsEl = document.getElementById('me-header-desc');
+    if (_stEl) _stEl.textContent = _meHeaders[tab].subtitle;
+    if (_ttEl) _ttEl.textContent = _meHeaders[tab].title;
+    if (_dsEl) _dsEl.textContent = _meHeaders[tab].desc;
+  }
 }
 
 function initMeSection() {
@@ -4620,7 +4552,7 @@ function beliefRenderAll() {
   var el = document.getElementById('belief-list');
   if (!el) return;
   if (!beliefBeliefs.length) {
-    el.innerHTML = '<div style="font-family:Lora,serif;font-style:italic;font-size:1rem;color:var(--gray);padding:0.5rem 0;">No beliefs yet. Add one above.</div>';
+    el.innerHTML = '<div style="font-family:Lora,serif;font-style:italic;font-size:0.78rem;color:var(--gray);padding:0;">No beliefs yet. Add one above.</div>';
     return;
   }
   el.innerHTML = beliefBeliefs.map(function(b) {
@@ -4688,12 +4620,17 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<div class="section" id="me" style="padding-top:0.5rem;">
+<div class="section" id="me">
+
+  <div id="me-header-subtitle" class="subtitle">Get to know you</div>
+  <h1 id="me-header-title">Who I am.</h1>
+  <div id="me-header-desc" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 1.5rem;line-height:1.6;">Everything that makes you, you 🤍</div>
 
   <!-- ME CONTENT -->
   <!-- Me sub-tabs -->
-  <div id="me-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
+  <div id="me-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
+    <button class="balance-sub-tab" onclick="showMeTab('infp')" id="metab-infp">INFP</button>
     <button class="balance-sub-tab" onclick="showMeTab('intj')" id="metab-intj">INTJ and ME</button>
   </div>
 
@@ -4704,7 +4641,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <div class="wia-panel active" id="wia-identity">
       <div style="border:1px solid #c8c8c5;padding:1.2rem;margin-bottom:0.75rem;">
         <div class="wia-identity-card" style="padding:0 0 0.6rem;margin-bottom:0;text-align:center;min-height:110px;display:flex;flex-direction:column;justify-content:center;align-items:center;">
-          <div class="wia-id-label">I am</div>
+          <div class="wia-id-label" style="margin-top:2rem;">I am</div>
           <div class="wia-id-name" id="wiaIdName">...</div>
           <div class="wia-id-traits" id="wiaIdTraits" style="justify-content:center;"></div>
         </div>
@@ -4723,7 +4660,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <button class="vision-type-btn" id="wia-type-btn-traits" onclick="wiaSetType('traits',this)">Traits</button>
           <button class="vision-type-btn" id="wia-type-btn-photo" onclick="wiaSetType('photo',this)">Photo</button>
         </div>
-        <div style="display:grid;grid-template-columns:auto 1fr;gap:0.2rem 0.6rem;margin-bottom:2rem;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:0.2rem 0.6rem;margin-bottom:2rem;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--gray);line-height:1.5;">
           <div style="color:var(--black);">Values</div>
           <div>the principles you want to live by (like honesty or freedom).</div>
           <div style="color:var(--black);">Traits</div>
@@ -5187,6 +5124,79 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 </div>
+
+  <!-- INFP -->
+  <div id="mesub-infp" style="display:none;margin-top:1.5rem;">
+    <div class="subtitle" style="margin-bottom:0.5rem;">INFP</div>
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Your inner world matters. 🤍</div>
+
+    <!-- Track Days toggle -->
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;cursor:pointer;" onclick="infpToggleCal()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+      <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Track Days</span>
+    </div>
+
+    <!-- Track Days calendar -->
+    <div id="infp-cal-wrap" style="display:none;margin-bottom:1.2rem;border:1px solid #e8e8e5;">
+      <div style="display:flex;min-height:200px;">
+        <div style="width:50%;min-width:0;border-right:1px solid #e8e8e5;padding:0.5rem;box-sizing:border-box;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;">
+            <button onclick="infpCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8249;</button>
+            <div id="infp-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.48rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);text-align:center;"></div>
+            <button onclick="infpCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8250;</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;" id="infp-cal-daynames"></div>
+          <div id="infp-cal-grid"></div>
+        </div>
+        <div id="infp-cal-day-view" style="width:50%;min-width:0;padding:0.6rem;box-sizing:border-box;overflow-y:auto;max-height:300px;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;font-weight:300;color:var(--gray);text-align:center;margin-top:2rem;">Tap a day 🤍</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">Notes & Reflections</div>
+      <textarea id="infp-notes" placeholder="Write your thoughts, feelings, ideas..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
+      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
+        <button onclick="infpSaveEntry('notes')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
+          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('notes',this)" style="display:none;">
+        </label>
+      </div>
+      <div id="infp-notes-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+      <div id="infp-notes-entries" style="margin-top:0.6rem;"></div>
+    </div>
+
+    <!-- Things I'm feeling -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">Things I'm Feeling</div>
+      <div id="infp-feelings-list" style="margin-top:0.5rem;"></div>
+      <input id="infp-feelings-input" placeholder="Add a feeling..." onkeydown="if(event.key==='Enter')infpAddFeeling()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+    </div>
+
+    <!-- Things I need -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">Things I Need Today</div>
+      <div id="infp-needs-list" style="margin-top:0.5rem;"></div>
+      <input id="infp-needs-input" placeholder="Add something you need..." onkeydown="if(event.key==='Enter')infpAddNeed()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+    </div>
+
+    <!-- Creative space -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">Creative Space</div>
+      <textarea id="infp-creative" placeholder="A dream, a story, a poem, an idea..." style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.88rem;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.8;color:var(--black);"></textarea>
+      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
+        <button onclick="infpSaveEntry('creative')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
+          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('creative',this)" style="display:none;">
+        </label>
+      </div>
+      <div id="infp-creative-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+      <div id="infp-creative-entries" style="margin-top:0.6rem;"></div>
+    </div>
+  </div>
+
     <!-- INTJ -->
     <div id="mesub-intj" style="display:none;padding-top:1rem;">
 
@@ -5212,13 +5222,13 @@ window.addEventListener('DOMContentLoaded', function() {
       <div style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Our Daily Schedule</div>
       <div id="intj-schedule-list" style="margin-bottom:0.8rem;"></div>
       <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-        <select id="intjScheduleHourInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;padding:0.45rem 0.5rem;color:var(--black);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;"></select>
-        <select id="intjScheduleMinInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;padding:0.45rem 0.5rem;color:var(--black);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;">
+        <select id="intjScheduleHourInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;padding:0.45rem 0.5rem;color:var(--gray);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;"></select>
+        <select id="intjScheduleMinInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;padding:0.45rem 0.5rem;color:var(--gray);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;">
           <option value="00">00</option>
           <option value="15">15</option>
           <option value="30">30</option>
         </select>
-        <select id="intjScheduleAmPmInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;padding:0.45rem 0.5rem;color:var(--black);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;">
+        <select id="intjScheduleAmPmInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;padding:0.45rem 0.5rem;color:var(--gray);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;">
           <option value="AM">AM</option>
           <option value="PM">PM</option>
         </select>
@@ -5498,74 +5508,22 @@ window.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- JOURNAL SECTION -->
-<div class="section" id="journal" style="padding-top:0.5rem;">
+<div class="section" id="journal">
 
-  <!-- Journal sub-tabs -->
-  <div id="journal-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
-    <button class="balance-sub-tab active" onclick="showJournalTab('belief')" id="jtabn-belief">Belief</button>
-    <button class="balance-sub-tab" onclick="showJournalTab('vent')" id="jtabn-vent">Journal</button>
-    <button class="balance-sub-tab" onclick="showJournalTab('books')" id="jtabn-books">Books</button>
-    <button class="balance-sub-tab" onclick="showJournalTab('wins')" id="jtabn-wins">Wins</button>
-  </div>
 
-    <!-- BELIEF -->
-    <div id="jsub-belief" style="margin-top:1.5rem;">
-      <div class="subtitle">
-        <style>@media(max-width:480px){#jsub-belief{margin-top:2rem!important;}}</style>Rewire your mind</div>
-      <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
-        <h2 style="margin:0;">Change your belief.</h2>
-      </div>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Simple. Daily. It works over time.</div>
-      <div style="margin-bottom:1.5rem;">
-        <div class="subtitle" style="margin-bottom:0.4rem;">Now I choose to believe</div>
-        <input type="text" id="belief-new" placeholder="e.g. I am enough, always." onkeydown="if(event.key==='Enter')document.getElementById('belief-old').focus()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:0.9rem;">
-        <div class="subtitle" style="margin-bottom:0.4rem;">I used to believe</div>
-        <input type="text" id="belief-old" placeholder="e.g. I'm not good enough…" onkeydown="if(event.key==='Enter')beliefSaveNew()" onblur="beliefSaveNew()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1rem;">
-        <div style="display:flex;align-items:center;gap:0.5rem;">
-          <span style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Color</span>
-          <div style="display:flex;gap:0.4rem;">
-            <button class="belief-color-opt selected" data-color="#f9a8c9" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;flex-shrink:0;"></button>
-            <button class="belief-color-opt" data-color="#a8d8f0" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
-            <button class="belief-color-opt" data-color="#b8f0c8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
-            <button class="belief-color-opt" data-color="#f9e4a8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
-            <button class="belief-color-opt" data-color="#d4b8f9" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
-            <button class="belief-color-opt" data-color="#f9c8a8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
-            <button class="belief-color-opt" data-color="#c8e8c8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#c8e8c8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
-          </div>
-        </div>
-      </div>
-      <div id="belief-list" style="margin-top:2.5rem;"></div>
-    </div>
-    <div id="jsub-wins" style="display:none;margin-top:1.5rem;">
-      <div class="subtitle">Celebrate myself</div>
-      <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
-        <h2 style="margin:0;">My wins.</h2>
-      </div>
-      <div style="margin-bottom:1rem;">
-        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:0.8rem;">Add a win — big or small, they all count</div>
-        <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
-        <button class="btn fill" onclick="addWin()">Add win</button>
-      </div>
-      <div id="wins-list"></div>
-    </div>
+    <!-- JOURNAL (combined: Journal entries, Wins, Belief) -->
+    <div id="jsub-vent">
 
-    <!-- JOURNAL -->
-    <div id="jsub-vent" style="display:none;margin-top:1.5rem;">
       <div id="vent-section" class="subtitle">Let it all out</div>
-      <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
-        <h2 style="margin:0;">Journal.</h2>
-      </div>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Your safe space. No judgment 🤍</div>
-
-
+      <h1>Journal.</h1>
 
       <!-- Unified journal input -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div style="padding-bottom:0.3rem;margin-bottom:0.6rem;">
         <div style="display:flex;align-items:center;gap:0.5rem;">
-          <input id="vent-input" placeholder="Write anything..." onkeydown="if(event.key==='Enter'){event.preventDefault();saveVent();}" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-          <label for="vent-photo-input" style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:1rem;color:var(--gray);padding:0 0.2rem;line-height:1;flex-shrink:0;" title="Add photo">&#128247;</label>
+          <input id="vent-input" placeholder="Write anything..." onkeydown="if(event.key==='Enter'){event.preventDefault();saveVent();}" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button type="button" onclick="document.getElementById('vent-photo-input').click()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:var(--black);cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;" title="Add photo">Photo</button>
           <input type="file" id="vent-photo-input" accept="image/*" onchange="saveVentPhoto(this)" style="display:none;">
-          <button onclick="saveVent()" style="background:none;border:none;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);cursor:pointer;flex-shrink:0;padding:0;">Save</button>
+          <button onclick="saveVent()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:var(--black);cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Save</button>
         </div>
       </div>
 
@@ -5574,6 +5532,35 @@ window.addEventListener('DOMContentLoaded', function() {
       <!-- hidden compat divs -->
       <div id="vent-entries" style="display:none;"></div>
       <div id="vent-photos-list" style="display:none;"></div>
+
+      <div style="border-top:1px solid #e8e8e5;margin:9rem 0 0.6rem;"></div>
+      <div class="subtitle" style="margin-bottom:0.3rem;">Celebrate myself</div>
+      <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:1.5rem;">
+        <h2 style="margin:0;">My wins.</h2>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="addWin()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:var(--black);cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add win</button>
+        </div>
+      </div>
+      <div id="wins-list"></div>
+
+      <div style="border-top:1px solid #e8e8e5;margin:9rem 0 0.6rem;"></div>
+
+      <!-- BELIEF -->
+      <div class="subtitle" style="margin-bottom:0.3rem;">Rewire your mind</div>
+      <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:2.5rem;">
+        <h2 style="margin:0;">Change your belief.</h2>
+      </div>
+      <div style="margin-bottom:1.5rem;">
+        <div class="subtitle" style="margin-bottom:0.4rem;">Now I choose to believe</div>
+        <input type="text" id="belief-new" placeholder="e.g. I am enough, always." onkeydown="if(event.key==='Enter')document.getElementById('belief-old').focus()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:2rem;">
+        <div class="subtitle" style="margin-bottom:0.4rem;">I used to believe</div>
+        <input type="text" id="belief-old" placeholder="e.g. I'm not good enough…" onkeydown="if(event.key==='Enter')beliefSaveNew()" onblur="beliefSaveNew()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0 0.15rem;margin-bottom:0;">
+      </div>
+      <div id="belief-list" style="margin-top:0;"></div>
+
     </div>
 
     <!-- BOOKS -->
@@ -6527,6 +6514,32 @@ var jesusBibleCurrentChapter = 1;
 var jesusBibleSelStart = null;
 var jesusBibleSelEnd = null;
 
+// ESV API (Crossway) — personal, non-commercial use. Key registered at api.esv.org.
+var JESUS_ESV_API_KEY = '42ccc88801ce5318fbddfa157a68ac0f28869353';
+
+// Fetch a passage from the ESV API and parse it into { reference, verses:[{verse,text}] }
+function jesusFetchESV(query) {
+  var qs = 'q=' + encodeURIComponent(query) +
+    '&include-headings=false&include-footnotes=false&include-verse-numbers=true' +
+    '&include-short-copyright=false&include-passage-references=false&include-selahs=false';
+  return fetch('https://api.esv.org/v3/passage/text/?' + qs, {
+    headers: { 'Authorization': 'Token ' + JESUS_ESV_API_KEY }
+  })
+  .then(function(r) { if (!r.ok) throw new Error('not found'); return r.json(); })
+  .then(function(data) {
+    var text = (data && data.passages && data.passages[0]) ? data.passages[0].trim() : '';
+    if (!text) return null;
+    var verses = [];
+    var parts = text.split(/\[(\d+)\]\s*/);
+    for (var i = 1; i < parts.length; i += 2) {
+      var t = (parts[i + 1] || '').trim();
+      if (t) verses.push({ verse: parseInt(parts[i], 10), text: t });
+    }
+    if (!verses.length) return null;
+    return { reference: (data.canonical || query), verses: verses };
+  });
+}
+
 function jesusPopulateBibleBooks() {
   var sel = document.getElementById('jesus-bible-book');
   if (!sel || sel.options.length) return; // already populated
@@ -6562,10 +6575,9 @@ function jesusLoadBibleChapter() {
     textEl.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:var(--gray);">You\'re offline — reconnect to read this chapter.</div>';
     return;
   }
-  fetch('https://bible-api.com/' + encodeURIComponent(book + ' ' + chapter))
-    .then(function(r) { if (!r.ok) throw new Error('not found'); return r.json(); })
-    .then(function(data) {
-      jesusBibleChapterVerses = (data && data.verses) ? data.verses : [];
+  jesusFetchESV(book + ' ' + chapter)
+    .then(function(result) {
+      jesusBibleChapterVerses = result ? result.verses : [];
       jesusRenderBibleChapterText();
     })
     .catch(function() {
@@ -6621,14 +6633,14 @@ function jesusUseSelectedPassage() {
   if (box) {
     box.style.display = 'block';
     box.innerHTML = '<div style="border:1px solid #c8c8c5;padding:1rem;">' +
-      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">' + ref + ' · World English Bible</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">' + ref + ' · ESV</div>' +
       '<div style="font-family:\'Lora\',serif;font-size:0.95rem;line-height:1.85;color:var(--black);">' + body + '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;color:#ccc;margin-top:0.8rem;">ESV® Bible, copyright © 2001 by Crossway. Used by permission. esv.org</div>' +
     '</div>';
   }
 }
 
-// Read a passage inline using a free public Bible API (bible-api.com, KJV, no key needed).
-// Requires an internet connection — shows a friendly message if offline or the reference isn't recognized.
+// Read a passage inline using the ESV API (Crossway) — requires an internet connection.
 function jesusReadPassage() {
   var inp = document.getElementById('jesus-study-passage');
   var box = document.getElementById('jesus-passage-reader');
@@ -6641,21 +6653,19 @@ function jesusReadPassage() {
     box.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:var(--gray);padding:0.6rem 0;">You\'re offline — reconnect to read this passage.</div>';
     return;
   }
-  fetch('https://bible-api.com/' + encodeURIComponent(ref))
-    .then(function(r) { if (!r.ok) throw new Error('not found'); return r.json(); })
-    .then(function(data) {
-      if (!data || (!data.text && !(data.verses && data.verses.length))) {
+  jesusFetchESV(ref)
+    .then(function(result) {
+      if (!result) {
         box.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:var(--gray);padding:0.6rem 0;">Couldn\'t find that passage. Try a format like "John 3:16" or "Romans 8:1-4".</div>';
         return;
       }
-      var body = (data.verses && data.verses.length)
-        ? data.verses.map(function(v) {
-            return '<sup style="font-family:\'Nunito\',sans-serif;font-size:0.62rem;color:var(--gray);margin-right:0.15rem;">' + v.verse + '</sup>' + v.text.trim() + ' ';
-          }).join('')
-        : (data.text || '').trim();
+      var body = result.verses.map(function(v) {
+        return '<sup style="font-family:\'Nunito\',sans-serif;font-size:0.62rem;color:var(--gray);margin-right:0.15rem;">' + v.verse + '</sup>' + v.text + ' ';
+      }).join('');
       box.innerHTML = '<div style="border:1px solid #c8c8c5;padding:1rem;">' +
-        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">' + (data.reference || ref) + (data.translation_name ? ' · ' + data.translation_name : '') + '</div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">' + result.reference + ' · ESV</div>' +
         '<div style="font-family:\'Lora\',serif;font-size:0.95rem;line-height:1.85;color:var(--black);">' + body + '</div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;color:#ccc;margin-top:0.8rem;">ESV® Bible, copyright © 2001 by Crossway. Used by permission. esv.org</div>' +
       '</div>';
     })
     .catch(function() {
@@ -6668,11 +6678,15 @@ function jesusSaveStudyNote() {
   var passage = document.getElementById('jesus-study-passage') ? document.getElementById('jesus-study-passage').value.trim() : '';
   var note = document.getElementById('jesus-study-note') ? document.getElementById('jesus-study-note').value.trim() : '';
   if (!note) return;
+  var reader = document.getElementById('jesus-passage-reader');
+  var verseHtml = '';
+  if (reader && reader.style.display !== 'none' && reader.firstElementChild && reader.firstElementChild.children && reader.firstElementChild.children.length >= 2) {
+    verseHtml = reader.firstElementChild.children[1].innerHTML;
+  }
   if (!jesusData.studyNotes) jesusData.studyNotes = [];
-  jesusData.studyNotes.unshift({ id: Date.now(), passage: passage, note: note, date: new Date().toISOString() });
+  jesusData.studyNotes.unshift({ id: Date.now(), passage: passage, note: note, verseHtml: verseHtml, date: new Date().toISOString() });
   document.getElementById('jesus-study-passage').value = '';
   document.getElementById('jesus-study-note').value = '';
-  var reader = document.getElementById('jesus-passage-reader');
   if (reader) { reader.style.display = 'none'; reader.innerHTML = ''; }
   var status = document.getElementById('jesus-study-note-status');
   if (status) { status.textContent = 'Saved'; setTimeout(function(){ status.textContent = ''; }, 2000); }
@@ -6695,6 +6709,7 @@ function jesusRenderStudyNotes(skipLoad) {
         '<button onclick="jesusDeleteStudyNote('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1.15rem;cursor:pointer;flex-shrink:0;padding:0;">\u00d7</button>' +
       '</div>' +
       (x.passage ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.9rem;font-weight:300;color:var(--gray);margin-bottom:0.3rem;">' + x.passage + '</div>' : '') +
+      (x.verseHtml ? '<div style="font-family:\'Lora\',serif;font-size:0.92rem;line-height:1.75;color:var(--black);background:#faf9f7;border-left:2px solid #c8c8c5;padding:0.6rem 0.8rem;margin-bottom:0.5rem;">' + x.verseHtml + '</div>' : '') +
       '<div style="font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;line-height:1.6;white-space:pre-wrap;color:var(--black);">' + x.note + '</div>' +
     '</div>';
   }).join('');
@@ -12076,7 +12091,7 @@ function rhythmDeleteTagItem(elId, namespace, idx) {
 var INTJ_DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 var INTJ_DEFAULT_SCHEDULE = [
   { time: '8:00 AM',  text: 'Good morning message', who: 'both' },
-  { time: '12:30 PM', text: 'Lunch — check in, even briefly', who: 'both' },
+  { time: '12:30 PM', text: 'Lunch, check in even briefly', who: 'both' },
   { time: '1:00 PM',  text: 'Deep work / focus block, no interruptions', who: 'intj' },
   { time: '6:30 PM',  text: 'Dinner together', who: 'both' },
   { time: '8:00 PM',  text: 'Quiet wind-down / recharge time', who: 'intj' },
@@ -12139,7 +12154,7 @@ function intjRenderSchedule() {
       + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:2px 7px;">' + intjWhoLabel(item.who) + '</div>'
       + '<button onclick="intjDeleteSchedule(' + i + ')" style="font-size:0.6rem;color:var(--gray);border:none;background:none;cursor:pointer;line-height:1;">✕</button>'
       + '</div>'
-      + '<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;font-weight:300;color:var(--black);line-height:1.4;padding-right:5rem;">' + (item.time ? '<span style="font-size:0.82rem;">' + item.time + '</span> - ' : '') + item.text + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--gray);line-height:1.5;padding-right:5rem;">' + (item.time ? '<span style="font-size:0.98rem;">' + item.time + '</span> - ' : '') + item.text + '</div>'
       + '</div>';
   }).join('') + '</div>';
 }
@@ -12273,7 +12288,7 @@ function intjRenderCalendar() {
     var isToday = key === todayKey;
     var dateLabel = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
     return '<div style="padding:1.3rem 0;border-bottom:1px solid #f0f0ee;">'
-      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.66rem;letter-spacing:0.07em;text-transform:uppercase;color:' + (isToday ? 'var(--black)' : 'var(--gray)') + ';">' + dateLabel + (isToday ? ' - Today' : '') + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.66rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray);">' + dateLabel + (isToday ? ' - Today' : '') + '</div>'
       + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;margin-top:0.2rem;display:flex;align-items:center;gap:0.4rem;">' + (periods.length ? (intjHeartIcon(true) + '<span style="color:var(--black);">Connected</span><span style="color:var(--gray);"> - ' + periodsLabel + '</span>') : '<span style="color:var(--gray);">No connection logged</span>') + '</div>'
       + noteText
       + '</div>';
