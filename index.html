@@ -956,6 +956,7 @@ window.addEventListener('error', function(e) {
 
       <!-- LEFT: Schedule time rows -->
       <div id="ps-schedule" style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div id="tefi-verdict-box"></div>
         <div class="planner-label">Schedule</div>
         <div style="display:grid;grid-template-columns:auto 1fr;gap:0 0.4rem;margin-top:0.5rem;" id="schedule-time-rows"></div>
       </div>
@@ -2164,10 +2165,10 @@ function showSchedCalSummary(dateStr) {
   // Schedule checked items
   const schedule = pd.schedule || {};
   const DEFAULTS = {
-    '4:00_AM':['Wake up :) Good Morning :)'],'4:05_AM':['Smell fresh air'],
-    '4:10_AM':['Fix Bed','Wash Face'],'4:20_AM':['Brush Teeth','Drink Water'],
+    '4:00_AM':['Wake up'],
+    '4:10_AM':['Fix Bed','Wash Face','Brush Teeth','Drink Water'],
     '4:30_AM':['Calisthenics'],'5:00_AM':['Take a bath'],'5:15_AM':['Make Breakfast'],
-    '5:30_AM':["Talk to God - Read Bible, Pray, Journal, Meditate God's Word"],
+    '5:30_AM':["Talk to God (Read Bible, Pray, Journal, Meditate God's Word)"],
     '6:00_AM':['Eat Breakfast','Bath','Clothed'],'11:00_AM':['Cook Lunch'],
     '12:30_PM':['Eat Lunch'],'5:30_PM':['Cook Dinner'],
     '7:00_PM':['Eat Dinner','Read Book'],'7:30_PM':['Talk to People'],
@@ -2215,7 +2216,7 @@ function renderSchedule() {
   const day = getPlannerDay();
   const schedule = day.schedule || {};
   const slots = [
-    '4:00 AM','4:05 AM','4:10 AM','4:20 AM','4:25 AM','4:30 AM',
+    '4:00 AM','4:10 AM','4:30 AM',
     '5:00 AM','5:15 AM','5:30 AM','6:00 AM','6:30 AM','7:00 AM',
     '7:30 AM','8:00 AM','8:30 AM','9:00 AM','9:30 AM',
     '10:00 AM','10:30 AM','11:00 AM','11:30 AM','12:00 PM',
@@ -2227,14 +2228,12 @@ function renderSchedule() {
 
   // Default permanent items per slot
   const DEFAULTS = {
-    '4:00_AM': ['Wake up :) Good Morning :)'],
-    '4:05_AM': ['Smell fresh air'],
-    '4:10_AM': ['Fix Bed', 'Wash Face'],
-    '4:20_AM': ['Brush Teeth', 'Drink Water'],
+    '4:00_AM': ['Wake up'],
+    '4:10_AM': ['Fix Bed', 'Wash Face', 'Brush Teeth', 'Drink Water'],
     '4:30_AM': ['Calisthenics'],
     '5:00_AM': ['Take a bath'],
     '5:15_AM': ['Make Breakfast'],
-    '5:30_AM': ['Talk to God - Read Bible, Pray, Journal, Meditate God\'s Word'],
+    '5:30_AM': ['Talk to God (Read Bible, Pray, Journal, Meditate God\'s Word)'],
     '6:00_AM': ['Eat Breakfast', 'Bath', 'Clothed'],
     '11:00_AM': ['Cook Lunch'],
     '12:30_PM': ['Eat Lunch'],
@@ -2339,22 +2338,32 @@ function renderSchedule() {
 
     const defaults = DEFAULTS[key] || [];
     const defaultChecked = entry.defaultDone || {};
+    const defaultRemoved = entry.defaultRemoved || {};
 
     const defaultHtml = defaults.map((text, di) => {
+      if (defaultRemoved[di]) return '';
       const done = defaultChecked[di] || false;
-      return '<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">' +
-        '<div onclick="event.stopPropagation();toggleDefaultItem(\'' + key + '\',' + di + ')" style="width:12px;height:12px;border-radius:50%;border:1px solid ' + (done?'var(--black)':'#c8c8c5') + ';background:' + (done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
+      const dType = classifyScheduleItemType(text);
+      return '<div style="display:flex;align-items:flex-start;gap:0.3rem;padding:0.1rem 0;">' +
+        '<div onclick="event.stopPropagation();toggleDefaultItem(\'' + key + '\',' + di + ')" style="width:12px;height:12px;border-radius:50%;border:1px solid ' + (done?'var(--black)':'#c8c8c5') + ';background:' + (done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:0.2rem;">' +
           (done?'<svg width="7" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="white" stroke-width="1.5"/></svg>':'') +
         '</div>' +
+        (dType ?
+          '<span style="flex-shrink:0;font-family:\'Nunito\',sans-serif;font-size:0.5rem;font-weight:700;letter-spacing:0.05em;padding:0.1rem 0.35rem;border-radius:3px;margin-top:0.1rem;' + (dType==='te' ? 'background:var(--black);color:var(--white);' : 'background:var(--white);color:var(--gray);border:1px solid var(--gray);') + '">' + dType.toUpperCase() + '</span>'
+          : '') +
         '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;' + (done?'color:var(--gray);text-decoration:line-through;':'') + '">' + text + '</span>' +
+        '<button onclick="event.stopPropagation();removeDefaultItem(\'' + key + '\',' + di + ')" style="font-size:0.7rem;color:#bbb;border:none;background:none;cursor:pointer;flex-shrink:0;padding:0 0.2rem;">✕</button>' +
       '</div>';
     }).join('');
 
     const itemsHtml = userItems.map((item) =>
-      '<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">' +
-        '<div onclick="event.stopPropagation();toggleScheduleItem(\'' + key + '\',' + item.id + ')" style="width:12px;height:12px;border-radius:50%;border:1px solid ' + (item.done?'var(--black)':'#c8c8c5') + ';background:' + (item.done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
+      '<div style="display:flex;align-items:flex-start;gap:0.3rem;padding:0.1rem 0;">' +
+        '<div onclick="event.stopPropagation();toggleScheduleItem(\'' + key + '\',' + item.id + ')" style="width:12px;height:12px;border-radius:50%;border:1px solid ' + (item.done?'var(--black)':'#c8c8c5') + ';background:' + (item.done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:0.2rem;">' +
           (item.done?'<svg width="7" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="white" stroke-width="1.5"/></svg>':'') +
         '</div>' +
+        (item.type === 'te' || item.type === 'fi' ?
+          '<span onclick="event.stopPropagation();cycleScheduleItemType(\'' + key + '\',' + item.id + ')" style="cursor:pointer;flex-shrink:0;font-family:\'Nunito\',sans-serif;font-size:0.5rem;font-weight:700;letter-spacing:0.05em;padding:0.1rem 0.35rem;border-radius:3px;margin-top:0.1rem;' + (item.type==='te' ? 'background:var(--black);color:var(--white);' : 'background:var(--white);color:var(--gray);border:1px solid var(--gray);') + '">' + item.type.toUpperCase() + '</span>'
+          : '') +
         '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;' + (item.done?'color:var(--gray);text-decoration:line-through;':'') + '">' + item.text + '</span>' +
         (item.savedAt ? '<span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray);flex-shrink:0;margin-right:0.2rem;">' + item.savedAt + '</span>' : '') +
         '<button onclick="event.stopPropagation();removeScheduleItem(\'' + key + '\',' + item.id + ')" style="font-size:0.7rem;color:#bbb;border:none;background:none;cursor:pointer;flex-shrink:0;padding:0 0.2rem;">✕</button>' +
@@ -2365,11 +2374,126 @@ function renderSchedule() {
       '<div style="padding:0.1rem 0 0.3rem;">' +
         defaultHtml +
         itemsHtml +
-        '<input class="time-input" data-key="' + key + '" placeholder="" ' +
-          'onkeydown="if(event.key===\'Enter\'){event.preventDefault();addScheduleItem(\'' + key + '\',this);}" ' +
-          'style="width:100%;margin-top:0.2rem;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.1rem 0;">' +
+        '<div style="display:flex;align-items:center;gap:0.3rem;margin-top:0.2rem;">' +
+          '<input class="time-input" data-key="' + key + '" placeholder="" ' +
+            'onkeydown="if(event.key===\'Enter\'){event.preventDefault();addScheduleItem(\'' + key + '\',this);}" ' +
+            'style="flex:1;min-width:0;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.1rem 0;">' +
+        '</div>' +
       '</div>';
   }).join('');
+
+  renderTeFiVerdict();
+}
+
+// ── Te/Fi labeling for schedule items ──
+var SCHED_TE_WORDS = ['work','focus','deep work','project','plan','planning','task','goal','meeting',
+  'decision','organize','organise','schedule','efficient','efficiency','productivity','deadline',
+  'strategy','system','fix','solve','structure','review','report','budget','errand','chore','clean',
+  'workout','gym','exercise','study','build','code','email','call','logistics','routine','cook',
+  'wash','brush','bath','bathe','clothed','eat','breakfast','lunch','dinner','calisthenics','drink water'];
+var SCHED_FI_WORDS = ['talk','connect','feel','feeling','feelings','love','heart','recharge','quiet',
+  'alone time','journal','emotion','heard','listen','care','bond','together','hug','check in','check-in',
+  'vulnerable','share','support','cuddle','affirm','appreciate','gratitude','pray','meditate','read book',
+  'rest','relax','sleep','reflect','God','bible','wake up','good morning','smell fresh air'];
+
+function classifyScheduleItemType(text) {
+  var t = (text || '').toLowerCase();
+  var teScore = 0, fiScore = 0;
+  SCHED_TE_WORDS.forEach(function(w) { if (t.indexOf(w) !== -1) teScore++; });
+  SCHED_FI_WORDS.forEach(function(w) { if (t.indexOf(w) !== -1) fiScore++; });
+  if (teScore === 0 && fiScore === 0) return null;
+  if (teScore >= fiScore) return 'te';
+  return 'fi';
+}
+
+function cycleScheduleItemType(key, id) {
+  const dayKey = getDateKey();
+  const items = allPlannerData[dayKey]?.schedule?.[key]?.items;
+  if (!items) return;
+  const item = items.find(x => x.id == id);
+  if (!item) return;
+  item.type = item.type === 'te' ? 'fi' : (item.type === 'fi' ? null : 'te');
+  saveScheduleFast();
+  renderSchedule();
+}
+
+var SCHEDULE_FIXED_DEFAULTS = {
+  '4:00_AM': ['Wake up'],
+  '4:10_AM': ['Fix Bed', 'Wash Face', 'Brush Teeth', 'Drink Water'],
+  '4:30_AM': ['Calisthenics'],
+  '5:00_AM': ['Take a bath'],
+  '5:15_AM': ['Make Breakfast'],
+  '5:30_AM': ['Talk to God (Read Bible, Pray, Journal, Meditate God\'s Word)'],
+  '6:00_AM': ['Eat Breakfast', 'Bath', 'Clothed'],
+  '11:00_AM': ['Cook Lunch'],
+  '12:30_PM': ['Eat Lunch'],
+  '5:30_PM': ['Cook Dinner'],
+  '7:00_PM': ['Eat Dinner', 'Read Book'],
+  '7:30_PM': ['Talk to People'],
+  '8:00_PM': ['Studying Calisthenics and how to perform the right form of exercises'],
+  '8:30_PM': ['Journal'],
+  '9:00_PM': ['Sleep']
+};
+
+function computeTeFiForDay(dayKey) {
+  const day = allPlannerData[dayKey] || {};
+  const schedule = day.schedule || {};
+  let te = 0, fi = 0;
+  Object.keys(SCHEDULE_FIXED_DEFAULTS).forEach(key => {
+    const removed = (schedule[key] && schedule[key].defaultRemoved) || {};
+    SCHEDULE_FIXED_DEFAULTS[key].forEach((text, di) => {
+      if (removed[di]) return;
+      const t = classifyScheduleItemType(text);
+      if (t === 'te') te++;
+      else if (t === 'fi') fi++;
+    });
+  });
+  Object.keys(schedule).forEach(key => {
+    const entry = schedule[key];
+    if (Array.isArray(entry.items)) {
+      entry.items.forEach(it => {
+        if (it.type === 'te') te++;
+        else if (it.type === 'fi') fi++;
+      });
+    }
+  });
+  return { te, fi, total: te + fi };
+}
+
+function renderTeFiVerdict() {
+  const el = document.getElementById('tefi-verdict-box');
+  if (!el) return;
+  const dayKey = getDateKey();
+  const { te, fi, total } = computeTeFiForDay(dayKey);
+
+  if (total === 0) {
+    el.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.68rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;padding-bottom:0.6rem;border-bottom:1px solid #e8e8e5;">Add items to your schedule — each one is auto-tagged <b>Te</b> or <b>Fi</b> to show whether today calls for rest or more doing.</div>';
+    return;
+  }
+
+  const ratio = te / total;
+  let lead, body;
+  if (total < 2) {
+    lead = 'Keep tagging';
+    body = 'Add a couple more entries to get a read on today.';
+  } else if (ratio >= 0.6) {
+    lead = 'Lean toward rest';
+    body = 'Mostly Te today: organizing, deciding, pushing things through. That\'s your inferior function working hard. Give yourself space to drop into Fi, alone time, something that just feels right, no agenda.';
+  } else if (ratio <= 0.35) {
+    lead = 'You have room to do more / use Te';
+    body = 'Mostly Fi today: values, feelings, reflecting. You\'re likely not drained in the way Te-heavy days drain you — a good window to tackle a task that needs structure or follow-through.';
+  } else {
+    lead = 'Fairly balanced';
+    body = 'Te and Fi are close today. Trust how you actually feel — this mix alone isn\'t pushing strongly either way.';
+  }
+
+  el.innerHTML = '<div style="margin-bottom:0.8rem;padding-bottom:0.8rem;border-bottom:1px solid #e8e8e5;">' +
+    '<div style="display:flex;gap:1rem;font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">' +
+      '<span>Te <b style="color:var(--black);">' + te + '</b></span><span>Fi <b style="color:var(--black);">' + fi + '</b></span><span>Total <b style="color:var(--black);">' + total + '</b></span>' +
+    '</div>' +
+    '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.88rem;color:var(--black);margin-bottom:0.2rem;">' + lead + '</div>' +
+    '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;line-height:1.5;color:var(--black);">' + body + '</div>' +
+  '</div>';
 }
 
 var _schedAutoTimer = null;
@@ -2426,7 +2550,8 @@ function addScheduleItem(key, input) {
   const id = Date.now();
   const _now = new Date();
   const _timeLabel = _now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  items.push({id, text: val, done: false, savedAt: _timeLabel});
+  const _type = classifyScheduleItemType(val);
+  items.push({id, text: val, done: false, savedAt: _timeLabel, type: _type});
   allPlannerData[dayKey].schedule[key] = { items };
   input.value = '';
   saveScheduleFast();
@@ -2440,6 +2565,18 @@ function toggleDefaultItem(key, di) {
   if (!allPlannerData[dayKey].schedule[key]) allPlannerData[dayKey].schedule[key] = {};
   if (!allPlannerData[dayKey].schedule[key].defaultDone) allPlannerData[dayKey].schedule[key].defaultDone = {};
   allPlannerData[dayKey].schedule[key].defaultDone[di] = !allPlannerData[dayKey].schedule[key].defaultDone[di];
+  saveScheduleFast();
+  renderSchedule();
+  if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
+}
+
+function removeDefaultItem(key, di) {
+  const dayKey = getDateKey();
+  if (!allPlannerData[dayKey]) allPlannerData[dayKey] = {};
+  if (!allPlannerData[dayKey].schedule) allPlannerData[dayKey].schedule = {};
+  if (!allPlannerData[dayKey].schedule[key]) allPlannerData[dayKey].schedule[key] = {};
+  if (!allPlannerData[dayKey].schedule[key].defaultRemoved) allPlannerData[dayKey].schedule[key].defaultRemoved = {};
+  allPlannerData[dayKey].schedule[key].defaultRemoved[di] = true;
   saveScheduleFast();
   renderSchedule();
   if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
@@ -12154,7 +12291,7 @@ function intjRenderSchedule() {
       + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:2px 7px;">' + intjWhoLabel(item.who) + '</div>'
       + '<button onclick="intjDeleteSchedule(' + i + ')" style="font-size:0.6rem;color:var(--gray);border:none;background:none;cursor:pointer;line-height:1;">✕</button>'
       + '</div>'
-      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--gray);line-height:1.5;padding-right:5rem;">' + (item.time ? '<span style="font-size:0.98rem;">' + item.time + '</span> - ' : '') + item.text + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:var(--gray);line-height:1.5;padding-right:5rem;">' + (item.time ? '<span style="font-size:0.85rem;">' + item.time + '</span> - ' : '') + item.text + '</div>'
       + '</div>';
   }).join('') + '</div>';
 }
