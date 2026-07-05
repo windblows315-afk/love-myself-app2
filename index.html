@@ -73,7 +73,7 @@
     'bel_foundation','bel_evidence','bel_failure','belief_beliefs',
     'balance_data','vision_items','ritual_state','user_rituals',
     'bc_habits_data','face_habits_data','daily_data','rfm_data','jesus_data',
-    'my_routine_data','routine_todos','routine_notes','routine_photos','wia_photos'];
+    'my_routine_data','routine_todos','routine_notes','routine_photos','wia_photos','bp_data'];
   const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_','rhythm_day_','rhythm_month_','rhythm_year_'];
 
   function _shouldSync(key) {
@@ -906,7 +906,7 @@ window.addEventListener('error', function(e) {
   <div class="subtitle">Dream it, live it</div>
   <h1>My vision board.</h1>
   <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 1.5rem;line-height:1.6;">Build a vision board for every area of your life 🤍</div>
-  <div id="vision-board-section" style="margin-bottom:2rem;"></div>
+  <div id="vision-board-section" class="vision-board-mount" style="margin-bottom:2rem;"></div>
   <div id="dimension-boards"></div>
 
 </div>
@@ -3041,27 +3041,30 @@ visionStyle.textContent = `
 document.head.appendChild(visionStyle);
 
 let visionItems = JSON.parse(localStorage.getItem('vision_items') || '[]');
-let currentVisionType = 'dream';
 
-function selectVisionType(btn) {
-  currentVisionType = btn.dataset.type || btn.getAttribute('data-type') || 'dream';
-  document.querySelectorAll('#vision-type-btns .vision-type-btn').forEach(function(b) {
+function selectVisionType(btn, mountId) {
+  var mount = document.getElementById(mountId);
+  var type = btn.dataset.type || btn.getAttribute('data-type') || 'dream';
+  if (mount) mount.dataset.currentType = type;
+  document.querySelectorAll('#' + mountId + '-type-btns .vision-type-btn').forEach(function(b) {
     b.classList.toggle('active', b === btn);
   });
   ['dream','word','image'].forEach(function(t) {
-    var el = document.getElementById('vision-input-' + t);
-    if (el) el.style.display = t === currentVisionType ? (t === 'image' ? 'block' : 'flex') : 'none';
+    var el = document.getElementById(mountId + '-input-' + t);
+    if (el) el.style.display = t === type ? (t === 'image' ? 'block' : 'flex') : 'none';
   });
 }
 
-function addVisionItem() {
-  var inp = document.getElementById('vision-text-' + currentVisionType);
+function addVisionItem(mountId) {
+  var mount = document.getElementById(mountId);
+  var type = (mount && mount.dataset.currentType) || 'dream';
+  var inp = document.getElementById(mountId + '-text-' + type);
   if (!inp || !inp.value.trim()) return;
   visionItems.unshift({
     id: Date.now(),
-    type: currentVisionType,
+    type: type,
     content: inp.value.trim(),
-    date: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+    date: new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
   });
   inp.value = '';
   localStorage.setItem('vision_items', JSON.stringify(visionItems));
@@ -3069,10 +3072,10 @@ function addVisionItem() {
   renderVisionBoard();
 }
 
-async function addVisionImage(input) {
+async function addVisionImage(input, mountId) {
   var file = input.files[0];
   if (!file) return;
-  var date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  var date = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   var tempId = Date.now();
   visionItems.unshift({ id: tempId, type: 'image', content: '', date: date, uploading: true });
   renderVisionBoard();
@@ -3087,7 +3090,7 @@ async function addVisionImage(input) {
     }
     localStorage.setItem('vision_items', JSON.stringify(visionItems));
     if (typeof syncToCloud === 'function' && !url.startsWith('__offline__')) syncToCloud('vision_items', visionItems);
-    var fi = document.getElementById('vision-file-input');
+    var fi = document.getElementById(mountId + '-file-input');
     if (fi) fi.value = '';
     renderVisionBoard();
   } catch(e) {
@@ -3098,13 +3101,13 @@ async function addVisionImage(input) {
       var idx2 = visionItems.findIndex(function(i){ return i.id === tempId; });
       if (idx2 !== -1) { visionItems[idx2].content = url; visionItems[idx2].uploading = false; visionItems[idx2].pendingUpload = true; }
       localStorage.setItem('vision_items', JSON.stringify(visionItems));
-      var fi2 = document.getElementById('vision-file-input');
+      var fi2 = document.getElementById(mountId + '-file-input');
       if (fi2) fi2.value = '';
       renderVisionBoard();
     } catch(e2) {
       var idx3 = visionItems.findIndex(function(i){ return i.id === tempId; });
       if (idx3 !== -1) visionItems.splice(idx3, 1);
-      var fi3 = document.getElementById('vision-file-input');
+      var fi3 = document.getElementById(mountId + '-file-input');
       if (fi3) fi3.value = '';
       renderVisionBoard();
     }
@@ -3128,41 +3131,48 @@ function renderVisionBoard(fromStorage) {
   if (fromStorage) {
     try { var _f = localStorage.getItem('vision_items'); if (_f) { visionItems = JSON.parse(_f); if (!Array.isArray(visionItems)) visionItems = []; } } catch(e) {}
   }
-  var el = document.getElementById('vision-board-section');
+  document.querySelectorAll('.vision-board-mount').forEach(function(el) {
+    renderVisionBoardInto(el.id);
+  });
+}
+
+function renderVisionBoardInto(mountId) {
+  var el = document.getElementById(mountId);
   if (!el) return;
   // Build static controls only once — do NOT rebuild on every render (would destroy the file input mid-upload)
-  if (!document.getElementById('vision-type-btns')) {
+  if (!document.getElementById(mountId + '-type-btns')) {
+    el.dataset.currentType = 'dream';
     el.innerHTML = '<div style="margin-bottom:1.5rem;">'
-      + '<div id="vision-type-btns" style="display:flex;gap:0.4rem;margin-bottom:0.8rem;">'
-      + '<button class="vision-type-btn active" data-type="dream" onclick="selectVisionType(this)">Dream</button>'
-      + '<button class="vision-type-btn" data-type="word" onclick="selectVisionType(this)">Word</button>'
-      + '<button class="vision-type-btn" data-type="image" onclick="selectVisionType(this)">Image</button>'
+      + '<div id="' + mountId + '-type-btns" style="display:flex;gap:0.4rem;margin-bottom:0.8rem;">'
+      + '<button class="vision-type-btn active" data-type="dream" onclick="selectVisionType(this,\'' + mountId + '\')">Dream</button>'
+      + '<button class="vision-type-btn" data-type="word" onclick="selectVisionType(this,\'' + mountId + '\')">Word</button>'
+      + '<button class="vision-type-btn" data-type="image" onclick="selectVisionType(this,\'' + mountId + '\')">Image</button>'
       + '</div>'
-      + '<div id="vision-input-dream" style="display:flex;gap:0.5rem;align-items:center;">'
-      + '<input id="vision-text-dream" placeholder="A dream you&#39;re working toward…" onkeydown="if(event.key===&#39;Enter&#39;)addVisionItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:Nunito,sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">'
-      + '<button onclick="addVisionItem()" style="font-family:Nunito,sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>'
+      + '<div id="' + mountId + '-input-dream" style="display:flex;gap:0.5rem;align-items:center;">'
+      + '<input id="' + mountId + '-text-dream" placeholder="A dream you&#39;re working toward…" onkeydown="if(event.key===&#39;Enter&#39;)addVisionItem(\'' + mountId + '\')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:Nunito,sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">'
+      + '<button onclick="addVisionItem(\'' + mountId + '\')" style="font-family:Nunito,sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>'
       + '</div>'
-      + '<div id="vision-input-word" style="display:none;gap:0.5rem;align-items:center;">'
-      + '<input id="vision-text-word" placeholder="A word that calls you forward…" onkeydown="if(event.key===&#39;Enter&#39;)addVisionItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:Nunito,sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">'
-      + '<button onclick="addVisionItem()" style="font-family:Nunito,sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>'
+      + '<div id="' + mountId + '-input-word" style="display:none;gap:0.5rem;align-items:center;">'
+      + '<input id="' + mountId + '-text-word" placeholder="A word that calls you forward…" onkeydown="if(event.key===&#39;Enter&#39;)addVisionItem(\'' + mountId + '\')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:Nunito,sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">'
+      + '<button onclick="addVisionItem(\'' + mountId + '\')" style="font-family:Nunito,sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>'
       + '</div>'
-      + '<div id="vision-input-image" style="display:none;">'
-      + '<input type="file" accept="image/*" id="vision-file-input" style="font-size:0.82rem;width:100%;">'
+      + '<div id="' + mountId + '-input-image" style="display:none;">'
+      + '<input type="file" accept="image/*" id="' + mountId + '-file-input" style="font-size:0.82rem;width:100%;">'
       + '</div>'
       + '</div>'
-      + '<div id="vision-grid"></div>';
+      + '<div id="' + mountId + '-grid"></div>';
     // Attach file input listener safely (only once, after innerHTML is set)
-    var _fi = document.getElementById('vision-file-input');
+    var _fi = document.getElementById(mountId + '-file-input');
     if (_fi && !_fi._listenerAttached) {
       _fi._listenerAttached = true;
-      _fi.addEventListener('change', function() { addVisionImage(this); });
+      _fi.addEventListener('change', function() { addVisionImage(this, mountId); });
     }
   }
   // Always update only the grid — never touch the controls
-  var grid = document.getElementById('vision-grid');
+  var grid = document.getElementById(mountId + '-grid');
   if (!grid) return;
   if (!visionItems.length) {
-    grid.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:Lora,serif;margin-top:0.5rem;">Your vision board is empty. Add a dream, a word, or an image 🤍</p>';
+    grid.innerHTML = '';
     return;
   }
   var groupedItems = ['word','image','dream'].reduce(function(acc, t) {
@@ -4234,7 +4244,7 @@ function belCheckinRender() {
 
 
 function showMeTab(tab) {
-  ['whiam','infp','intj','me','assertive','believe','rightforme','friends'].forEach(function(t) {
+  ['whiam','intj','blueprint','me','assertive','believe','rightforme','friends'].forEach(function(t) {
     var el = document.getElementById('mesub-' + t);
     var btn = document.getElementById('metab-' + t);
     if (t === 'believe') {
@@ -4247,12 +4257,12 @@ function showMeTab(tab) {
   if (tab === 'assertive') { assCheckinRender(); belCheckinRender(); }
   if (tab === 'balance') { showMeTab('whiam'); setTimeout(function(){ wiaTab('balance'); initBalanceDatePicker(); renderBalanceQuestions(); renderRelationshipQuestions(); }, 50); return; }
   if (tab === 'assertive') { initAssertive(); initBelieve(); }
-  if (tab === 'intj') intjRender();
-  if (tab === 'infp') { if (typeof infpLoad === 'function') infpLoad(); }
+  if (tab === 'intj') { intjRender(); if (typeof infpLoad === 'function') infpLoad(); }
+  if (tab === 'blueprint') { if (typeof bpLoad === 'function') bpLoad(); }
   var _meHeaders = {
     whiam: { subtitle: 'Get to know you', title: 'Who I am.', desc: 'Everything that makes you, you 🤍' },
-    infp: { subtitle: 'Your inner world matters', title: 'INFP and INTJ.', desc: 'A quiet space for feelings, needs, and creativity 🤍' },
-    intj: { subtitle: 'Understand your mind', title: 'INTJ and me.', desc: 'How your personality shows up in daily life 🤍' }
+    intj: { subtitle: 'Understand your mind', title: 'INTJ and me.', desc: 'How your personality shows up in daily life 🤍' },
+    blueprint: { subtitle: 'Design it on purpose', title: 'Blueprint.', desc: 'Your vision, values, and the goals that get you there 🤍' }
   };
   if (_meHeaders[tab]) {
     var _stEl = document.getElementById('me-header-subtitle');
@@ -4770,8 +4780,8 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- Me sub-tabs -->
   <div id="me-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
-    <button class="balance-sub-tab" onclick="showMeTab('infp')" id="metab-infp">INFP and INTJ</button>
     <button class="balance-sub-tab" onclick="showMeTab('intj')" id="metab-intj">INTJ and ME</button>
+    <button class="balance-sub-tab" onclick="showMeTab('blueprint')" id="metab-blueprint">Blueprint</button>
   </div>
 
   <!-- ME SUB-SECTIONS -->
@@ -5265,8 +5275,8 @@ window.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-  <!-- INFP -->
-  <div id="mesub-infp" style="display:none;margin-top:1.5rem;">
+    <!-- INTJ -->
+    <div id="mesub-intj" style="display:none;padding-top:1rem;">
     <div class="subtitle" style="margin-bottom:0.5rem;">INFP and INTJ</div>
     <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Your inner world matters. 🤍</div>
 
@@ -5396,10 +5406,6 @@ window.addEventListener('DOMContentLoaded', function() {
       <div id="infp-notes-entries" style="margin-top:0.6rem;"></div>
     </div>
 
-  </div>
-
-    <!-- INTJ -->
-    <div id="mesub-intj" style="display:none;padding-top:1rem;">
 
       <div style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">This Week</div>
       <div style="font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;line-height:1.5;">Everything from this week, in one place.</div>
@@ -5468,6 +5474,56 @@ window.addEventListener('DOMContentLoaded', function() {
         <button onclick="intjAddItem('supportMe')" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
       </div>
       <div id="intj-list-supportMe"></div>
+    </div>
+
+    <!-- BLUEPRINT -->
+    <div id="mesub-blueprint" style="display:none;">
+      <!-- Vision Board -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+        <div class="planner-label" style="text-align:center;margin-bottom:0.6rem;">Vision Board</div>
+        <div id="bp-vision-board-section" class="vision-board-mount"></div>
+      </div>
+
+      <!-- Life Vision -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+        <div class="planner-label">Life Vision</div>
+        <textarea id="bp-vision" placeholder="In 5-10 years, what does your life look like? Career, relationships, home, growth..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:70px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
+        <div style="margin-top:0.4rem;">
+          <button onclick="bpSaveEntry('vision')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        </div>
+        <div id="bp-vision-entries" style="margin-top:0.6rem;"></div>
+      </div>
+
+      <!-- Goals & Milestones -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+        <div class="planner-label">Goals &amp; Milestones</div>
+        <div id="bp-goals-list" style="margin-top:0.5rem;"></div>
+        <input id="bp-goals-input" placeholder="Add a goal or milestone..." onkeydown="if(event.key==='Enter')bpAddGoal()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+      </div>
+
+      <!-- Core Values -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+        <div class="planner-label">Core Values</div>
+        <textarea id="bp-values" placeholder="What matters most to you? The principles you want to build your life around..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
+        <div style="margin-top:0.4rem;">
+          <button onclick="bpSaveEntry('values')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        </div>
+        <div id="bp-values-entries" style="margin-top:0.6rem;"></div>
+      </div>
+
+      <!-- Notes & Reflections -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label">Notes &amp; Reflections</div>
+        <textarea id="bp-notes" placeholder="Thoughts on your path, ideas, things to revisit..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
+        <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
+          <button onclick="bpSaveEntry('notes')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+          <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
+            + Photo <input type="file" accept="image/*" onchange="bpAddPhoto('notes',this)" style="display:none;">
+          </label>
+        </div>
+        <div id="bp-notes-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+        <div id="bp-notes-entries" style="margin-top:0.6rem;"></div>
+      </div>
     </div>
 
     <!-- FRIENDS -->
@@ -10639,7 +10695,7 @@ function infpSaveEntry(section) {
   if (!infpData.entries) infpData.entries = {};
   if (!infpData.entries[section]) infpData.entries[section] = [];
   var now = new Date();
-  var time = now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  var time = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   var dateKey = now.toISOString().split('T')[0];
   var isSolution = INFP_SOLUTION_SECTIONS.indexOf(section) !== -1 && classifyInfpEntryIsSolution(text);
   infpData.entries[section].unshift({ id: Date.now(), text: text, time: time, dateKey: dateKey, isSolution: isSolution });
@@ -10684,7 +10740,7 @@ function infpAddPhoto(section, input) {
     if (!infpData.photos) infpData.photos = {};
     if (!infpData.photos[section]) infpData.photos[section] = [];
     var _now = new Date();
-    var _time = _now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + _now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    var _time = _now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' · ' + _now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
     infpData.photos[section].unshift({ id: Date.now(), src: e.target.result, date: new Date().toISOString(), time: _time });
     infpSave();
     infpRenderPhotos(section);
@@ -10731,6 +10787,164 @@ function infpRenderPhotos(section) {
       + '<button onclick="infpDeletePhoto(\'' + section + '\',' + p.id + ')" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.5);border:none;color:white;width:18px;height:18px;font-size:0.7rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;border-radius:50%;">×</button>'
       + '</div>'
       + (p.time ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);margin-top:0.2rem;max-width:80px;line-height:1.3;">' + p.time + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+// ── Blueprint (Life Vision, Goals & Milestones, Core Values, Notes) ──
+var bpData = {};
+
+function bpLoad() {
+  try { bpData = JSON.parse(localStorage.getItem('bp_data') || '{}'); } catch(e) { bpData = {}; }
+  bpRenderEntries('vision');
+  bpRenderEntries('values');
+  bpRenderEntries('notes');
+  bpRenderPhotos('notes');
+  bpRenderGoals();
+  if (typeof renderVisionBoard === 'function') renderVisionBoard();
+}
+
+function bpSave() {
+  localStorage.setItem('bp_data', JSON.stringify(bpData));
+}
+
+function bpSaveEntry(section) {
+  var inp = document.getElementById('bp-' + section);
+  if (!inp) return;
+  var text = inp.value.trim();
+  if (!text) return;
+  if (!bpData.entries) bpData.entries = {};
+  if (!bpData.entries[section]) bpData.entries[section] = [];
+  var now = new Date();
+  var time = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  var dateKey = now.toISOString().split('T')[0];
+  bpData.entries[section].unshift({ id: Date.now(), text: text, time: time, dateKey: dateKey });
+  bpSave();
+  inp.value = '';
+  bpRenderEntries(section);
+}
+
+function bpDeleteEntry(section, id) {
+  if (!bpData.entries || !bpData.entries[section]) return;
+  bpData.entries[section] = bpData.entries[section].filter(function(e){ return e.id !== id; });
+  bpSave();
+  bpRenderEntries(section);
+}
+
+function bpRenderEntries(section) {
+  var el = document.getElementById('bp-' + section + '-entries');
+  if (!el) return;
+  var list = (bpData.entries && bpData.entries[section]) || [];
+  if (!list.length) { el.innerHTML = ''; return; }
+  el.innerHTML = list.map(function(e) {
+    return '<div style="border-top:1px solid #eee;padding-top:0.6rem;margin-top:0.6rem;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">' + e.time + '</div>'
+      + '<button onclick="bpDeleteEntry(\''+section+'\','+e.id+')" style="font-size:0.8rem;color:#bbb;border:none;background:none;cursor:pointer;padding:0;line-height:1;">×</button>'
+      + '</div>'
+      + '<div style="margin-top:0.3rem;font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);line-height:1.7;white-space:pre-wrap;">' + e.text + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function bpAddPhoto(section, input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    if (!bpData.photos) bpData.photos = {};
+    if (!bpData.photos[section]) bpData.photos[section] = [];
+    var _now = new Date();
+    var _time = _now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' · ' + _now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    bpData.photos[section].unshift({ id: Date.now(), src: e.target.result, date: new Date().toISOString(), time: _time });
+    bpSave();
+    bpRenderPhotos(section);
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function bpDeletePhoto(section, id) {
+  if (!bpData.photos || !bpData.photos[section]) return;
+  bpData.photos[section] = bpData.photos[section].filter(function(p){ return p.id !== id; });
+  bpSave();
+  bpRenderPhotos(section);
+}
+
+function bpViewPhoto(section, id) {
+  if (!bpData.photos || !bpData.photos[section]) return;
+  var p = bpData.photos[section].find(function(x){ return x.id === id; });
+  if (!p) return;
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;display:flex;align-items:center;justify-content:center;';
+  function removeOverlay() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+  overlay.onclick = removeOverlay;
+  var img = document.createElement('img');
+  img.src = p.src;
+  img.style.cssText = 'max-width:92vw;max-height:88vh;object-fit:contain;display:block;';
+  var close = document.createElement('button');
+  close.textContent = '×';
+  close.style.cssText = 'position:absolute;top:1rem;right:1rem;background:none;border:none;color:white;font-size:2rem;cursor:pointer;line-height:1;';
+  close.onclick = function(e){ e.stopPropagation(); removeOverlay(); };
+  overlay.appendChild(img);
+  overlay.appendChild(close);
+  document.body.appendChild(overlay);
+}
+
+function bpRenderPhotos(section) {
+  var el = document.getElementById('bp-' + section + '-photos');
+  if (!el) return;
+  var list = (bpData.photos && bpData.photos[section]) || [];
+  el.innerHTML = list.map(function(p){
+    return '<div style="position:relative;">'
+      + '<div style="position:relative;width:80px;height:80px;">'
+      + '<img src="' + p.src + '" onclick="bpViewPhoto(\'' + section + '\',' + p.id + ')" style="width:80px;height:80px;object-fit:cover;display:block;cursor:pointer;">'
+      + '<button onclick="bpDeletePhoto(\'' + section + '\',' + p.id + ')" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.5);border:none;color:white;width:18px;height:18px;font-size:0.7rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;border-radius:50%;">×</button>'
+      + '</div>'
+      + (p.time ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);margin-top:0.2rem;max-width:80px;line-height:1.3;">' + p.time + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+function bpAddGoal() {
+  var inp = document.getElementById('bp-goals-input');
+  var text = inp.value.trim();
+  if (!text) return;
+  if (!bpData.goals) bpData.goals = [];
+  var now = new Date();
+  var time = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  bpData.goals.push({ id: Date.now(), text: text, done: false, time: time });
+  bpSave();
+  inp.value = '';
+  bpRenderGoals();
+}
+
+function bpToggleGoal(id) {
+  bpData.goals = (bpData.goals || []).map(function(g){ return g.id === id ? Object.assign({}, g, { done: !g.done }) : g; });
+  bpSave();
+  bpRenderGoals();
+}
+
+function bpDeleteGoal(id) {
+  bpData.goals = (bpData.goals || []).filter(function(g){ return g.id !== id; });
+  bpSave();
+  bpRenderGoals();
+}
+
+function bpRenderGoals() {
+  var el = document.getElementById('bp-goals-list');
+  if (!el) return;
+  var list = bpData.goals || [];
+  el.innerHTML = list.map(function(g){
+    return '<div style="padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
+      + '<div style="display:flex;align-items:center;gap:0.6rem;">'
+      + '<div onclick="bpToggleGoal(' + g.id + ')" style="cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid ' + (g.done ? 'var(--black)' : '#c8c8c5') + ';background:' + (g.done ? 'var(--black)' : 'transparent') + ';flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
+      + (g.done ? '<svg width="9" height="9" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="1.8"/></svg>' : '')
+      + '</div>'
+      + '<div onclick="bpToggleGoal(' + g.id + ')" style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;color:' + (g.done ? '#bbb' : 'var(--black)') + ';text-decoration:' + (g.done ? 'line-through' : 'none') + ';cursor:pointer;">' + g.text + '</div>'
+      + '<button onclick="bpDeleteGoal(' + g.id + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:1rem;padding:0;">×</button>'
+      + '</div>'
+      + (g.time ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-top:0.1rem;padding-left:22px;">' + g.time + '</div>' : '')
       + '</div>';
   }).join('');
 }
