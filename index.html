@@ -5396,33 +5396,6 @@ window.addEventListener('DOMContentLoaded', function() {
       <div id="infp-notes-entries" style="margin-top:0.6rem;"></div>
     </div>
 
-    <!-- Things I'm feeling -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">Things I'm Feeling</div>
-      <div id="infp-feelings-list" style="margin-top:0.5rem;"></div>
-      <input id="infp-feelings-input" placeholder="Add a feeling..." onkeydown="if(event.key==='Enter')infpAddFeeling()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-    </div>
-
-    <!-- Things I need -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">Things I Need Today</div>
-      <div id="infp-needs-list" style="margin-top:0.5rem;"></div>
-      <input id="infp-needs-input" placeholder="Add something you need..." onkeydown="if(event.key==='Enter')infpAddNeed()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-    </div>
-
-    <!-- Creative space -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">Creative Space</div>
-      <textarea id="infp-creative" placeholder="A dream, a story, a poem, an idea..." style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.88rem;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.8;color:var(--black);"></textarea>
-      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
-        <button onclick="infpSaveEntry('creative')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
-        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
-          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('creative',this)" style="display:none;">
-        </label>
-      </div>
-      <div id="infp-creative-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
-      <div id="infp-creative-entries" style="margin-top:0.6rem;"></div>
-    </div>
   </div>
 
     <!-- INTJ -->
@@ -10554,10 +10527,7 @@ function infpCalShift(dir) {
 function infpDayHasContent(key) {
   var entries = infpData.entries || {};
   var hasNote = (entries.notes || []).some(function(e){ return e.dateKey === key; });
-  var hasCreative = (entries.creative || []).some(function(e){ return e.dateKey === key; });
-  var hasFeeling = (infpData.feelings || []).some(function(f){ return f.dateKey === key; });
-  var hasNeed = (infpData.needs || []).some(function(n){ return n.dateKey === key; });
-  return hasNote || hasCreative || hasFeeling || hasNeed;
+  return hasNote;
 }
 
 function infpCalShowDay(key) {
@@ -10568,9 +10538,6 @@ function infpCalShowDay(key) {
 
   var entries = infpData.entries || {};
   var notes = (entries.notes || []).filter(function(e){ return e.dateKey === key; });
-  var creative = (entries.creative || []).filter(function(e){ return e.dateKey === key; });
-  var feelings = (infpData.feelings || []).filter(function(f){ return f.dateKey === key; });
-  var needs = (infpData.needs || []).filter(function(n){ return n.dateKey === key; });
 
   var html = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">' + label + '</div>';
 
@@ -10581,28 +10548,7 @@ function infpCalShowDay(key) {
     });
   }
 
-  if (creative.length) {
-    html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;' + (notes.length ? 'margin-top:0.6rem;' : '') + '">Creative</div>';
-    creative.forEach(function(e){
-      html += '<div style="margin-bottom:0.5rem;font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;line-height:1.7;white-space:pre-wrap;color:var(--black);">' + e.text + '</div>';
-    });
-  }
-
-  if (feelings.length) {
-    html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;' + (notes.length||creative.length ? 'margin-top:0.6rem;' : '') + '">Feelings</div>';
-    feelings.forEach(function(f){
-      html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;padding:0.2rem 0;border-bottom:1px solid #f5f5f3;color:var(--black);">' + f.text + '</div>';
-    });
-  }
-
-  if (needs.length) {
-    html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;margin-top:0.6rem;">Needed</div>';
-    needs.forEach(function(n){
-      html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;padding:0.2rem 0;border-bottom:1px solid #f5f5f3;color:' + (n.done ? '#bbb' : 'var(--black)') + ';text-decoration:' + (n.done ? 'line-through' : 'none') + ';">' + n.text + '</div>';
-    });
-  }
-
-  if (!notes.length && !creative.length && !feelings.length && !needs.length) {
+  if (!notes.length) {
     html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.75rem;font-weight:300;color:var(--gray);text-align:center;margin-top:1.5rem;">Nothing written.</div>';
   }
 
@@ -10645,12 +10591,8 @@ function infpRenderCal() {
 
 function infpLoad() {
   try { infpData = JSON.parse(localStorage.getItem('infp_data') || '{}'); } catch(e) { infpData = {}; }
-  infpRenderFeelings();
-  infpRenderNeeds();
   infpRenderPhotos('notes');
-  infpRenderPhotos('creative');
   infpRenderEntries('notes');
-  infpRenderEntries('creative');
   infpRenderEntries('whoiam');
   infpRenderEntries('whoheis');
   infpRenderEntries('problems');
@@ -10666,6 +10608,29 @@ function infpSave() {
   localStorage.setItem('infp_data', JSON.stringify(infpData));
 }
 
+// ── Auto-detect "solution" entries (Who We Are, Our Problems & Traumas, Notes & Reflections) ──
+var INFP_SOLUTION_SECTIONS = ['whoiam','whoheis','problems','problemshis','notes'];
+var INFP_SOLUTION_WORDS = ['solution','solve','solved','solving','fix','fixed','try','let\'s try',
+  'we could','we can','we will','i will','i\'ll','let\'s','going forward','next time','instead',
+  'agree','agreed','plan to','commit','change','improve','better if','what could help',
+  'we should','i should','from now on','moving forward','compromise','resolve','resolved'];
+
+function classifyInfpEntryIsSolution(text) {
+  var t = (text || '').toLowerCase();
+  var score = 0;
+  INFP_SOLUTION_WORDS.forEach(function(w) { if (t.indexOf(w) !== -1) score++; });
+  return score > 0;
+}
+
+function infpToggleEntrySolution(section, id) {
+  var list = (infpData.entries && infpData.entries[section]) || [];
+  var entry = list.find(function(e) { return e.id === id; });
+  if (!entry) return;
+  entry.isSolution = !entry.isSolution;
+  infpSave();
+  infpRenderEntries(section);
+}
+
 function infpSaveEntry(section) {
   var inp = document.getElementById('infp-' + section);
   if (!inp) return;
@@ -10676,7 +10641,8 @@ function infpSaveEntry(section) {
   var now = new Date();
   var time = now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   var dateKey = now.toISOString().split('T')[0];
-  infpData.entries[section].unshift({ id: Date.now(), text: text, time: time, dateKey: dateKey });
+  var isSolution = INFP_SOLUTION_SECTIONS.indexOf(section) !== -1 && classifyInfpEntryIsSolution(text);
+  infpData.entries[section].unshift({ id: Date.now(), text: text, time: time, dateKey: dateKey, isSolution: isSolution });
   infpSave();
   inp.value = '';
   infpRenderEntries(section);
@@ -10695,92 +10661,17 @@ function infpRenderEntries(section) {
   var list = (infpData.entries && infpData.entries[section]) || [];
   if (!list.length) { el.innerHTML = ''; return; }
   var isCreative = section === 'creative';
+  var canTagSolution = INFP_SOLUTION_SECTIONS.indexOf(section) !== -1;
   el.innerHTML = list.map(function(e) {
     return '<div style="border-top:1px solid #eee;padding-top:0.6rem;margin-top:0.6rem;">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;">'
+      + '<div style="display:flex;align-items:center;gap:0.4rem;">'
       + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">' + e.time + '</div>'
+      + (canTagSolution ? '<span onclick="infpToggleEntrySolution(\''+section+'\','+e.id+')" style="cursor:pointer;font-family:\'Nunito\',sans-serif;font-size:0.5rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:0.1rem 0.35rem;border-radius:3px;' + (e.isSolution ? 'background:var(--black);color:var(--white);' : 'background:var(--white);color:var(--gray);border:1px solid var(--gray);') + '">' + (e.isSolution ? 'Solution' : 'Not a Solution') + '</span>' : '')
+      + '</div>'
       + '<button onclick="infpDeleteEntry(\''+section+'\','+e.id+')" style="font-size:0.8rem;color:#bbb;border:none;background:none;cursor:pointer;padding:0;line-height:1;">×</button>'
       + '</div>'
       + '<div style="margin-top:0.3rem;font-family:' + (isCreative ? '\'Lora\',serif;font-style:italic' : '\'Nunito\',sans-serif') + ';font-size:0.88rem;font-weight:300;color:var(--black);line-height:1.7;white-space:pre-wrap;">' + e.text + '</div>'
-      + '</div>';
-  }).join('');
-}
-
-function infpAddFeeling() {
-  var inp = document.getElementById('infp-feelings-input');
-  var text = inp.value.trim();
-  if (!text) return;
-  if (!infpData.feelings) infpData.feelings = [];
-  var _now = new Date();
-  var _time = _now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + _now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  var _dateKey = _now.toISOString().split('T')[0];
-  infpData.feelings.push({ id: Date.now(), text: text, time: _time, dateKey: _dateKey });
-  infpSave();
-  inp.value = '';
-  infpRenderFeelings();
-}
-
-function infpDeleteFeeling(id) {
-  infpData.feelings = (infpData.feelings || []).filter(function(f){ return f.id !== id; });
-  infpSave();
-  infpRenderFeelings();
-}
-
-function infpRenderFeelings() {
-  var el = document.getElementById('infp-feelings-list');
-  if (!el) return;
-  var list = infpData.feelings || [];
-  el.innerHTML = list.map(function(f){
-    return '<div style="padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
-      + '<div style="display:flex;justify-content:space-between;align-items:center;">'
-      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);">' + f.text + '</div>'
-      + '<button onclick="infpDeleteFeeling(' + f.id + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:1rem;padding:0;">×</button>'
-      + '</div>'
-      + (f.time ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-top:0.1rem;">' + f.time + '</div>' : '')
-      + '</div>';
-  }).join('');
-}
-
-function infpAddNeed() {
-  var inp = document.getElementById('infp-needs-input');
-  var text = inp.value.trim();
-  if (!text) return;
-  if (!infpData.needs) infpData.needs = [];
-  var _now = new Date();
-  var _time = _now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + _now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  var _dateKey = _now.toISOString().split('T')[0];
-  infpData.needs.push({ id: Date.now(), text: text, done: false, time: _time, dateKey: _dateKey });
-  infpSave();
-  inp.value = '';
-  infpRenderNeeds();
-}
-
-function infpToggleNeed(id) {
-  infpData.needs = (infpData.needs || []).map(function(n){ return n.id === id ? Object.assign({}, n, { done: !n.done }) : n; });
-  infpSave();
-  infpRenderNeeds();
-}
-
-function infpDeleteNeed(id) {
-  infpData.needs = (infpData.needs || []).filter(function(n){ return n.id !== id; });
-  infpSave();
-  infpRenderNeeds();
-}
-
-function infpRenderNeeds() {
-  var el = document.getElementById('infp-needs-list');
-  if (!el) return;
-  var list = infpData.needs || [];
-  el.innerHTML = list.map(function(n){
-    return '<div style="padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
-      + '<div style="display:flex;align-items:center;gap:0.6rem;">'
-      + '<div onclick="infpToggleNeed(' + n.id + ')" style="cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid ' + (n.done ? 'var(--black)' : '#c8c8c5') + ';background:' + (n.done ? 'var(--black)' : 'transparent') + ';flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
-      + (n.done ? '<svg width="9" height="9" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="1.8"/></svg>' : '')
-      + '</div>'
-      + '<div onclick="infpToggleNeed(' + n.id + ')" style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;color:' + (n.done ? '#bbb' : 'var(--black)') + ';text-decoration:' + (n.done ? 'line-through' : 'none') + ';cursor:pointer;">' + n.text + '</div>'
-      + '<button onclick="infpDeleteNeed(' + n.id + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:1rem;padding:0;">×</button>'
-      + '</div>'
-      + (n.time ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-top:0.1rem;padding-left:22px;">' + n.time + '</div>' : '')
       + '</div>';
   }).join('');
 }
