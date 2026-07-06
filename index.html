@@ -149,18 +149,7 @@
         if (typeof jesusRenderStudyNotes === 'function') jesusRenderStudyNotes(true);
         if (typeof jesusRenderStudyQuestions === 'function') jesusRenderStudyQuestions(true);
         if (typeof jesusRenderHeIs === 'function') jesusRenderHeIs();
-        if (typeof jesusGetDay === 'function' && typeof jesusCurrentDate !== 'undefined') {
-          var _day = jesusGetDay(jesusCurrentDate);
-          var _tEl = document.getElementById('jesus-pray-things-list');
-          if (_tEl && typeof jesusRenderPrayCombined === 'function') _tEl.innerHTML = jesusRenderPrayCombined(_day);
-          var _aEl = document.getElementById('jesus-answered-list');
-          if (_aEl && typeof jesusRenderAnsweredCombined === 'function') _aEl.innerHTML = jesusRenderAnsweredCombined(_day);
-          var _gEl = document.getElementById('jesus-godsaid-list');
-          if (_gEl) _gEl.innerHTML = (_day.godsaid && _day.godsaid.length) ? _day.godsaid.map(function(x) {
-            var dl = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
-            return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;"><div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + dl + '</div><button onclick="jesusDeleteGodSaid('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">\u00d7</button></div><div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;">' + x.body + '</div></div>';
-          }).join('') : '';
-        }
+        if (typeof jesusRender === 'function') { jesusRender('prayer'); jesusRender('action'); }
       } catch(e) {}
     }
 
@@ -3674,7 +3663,7 @@ function reloadAllData() {
   if (typeof renderRelationshipQuestions === 'function') renderRelationshipQuestions();
   // Jesus
   if (typeof jesusLoad === 'function') jesusLoad();
-  if (typeof jesusRenderPray === 'function') jesusRenderPray();
+  if (typeof jesusRender === 'function') { jesusRender('prayer'); jesusRender('action'); }
   if (typeof jesusRenderHeIs === 'function') jesusRenderHeIs();
   if (typeof jesusRenderStudyNotes === 'function') jesusRenderStudyNotes();
   if (typeof jesusRenderStudyQuestions === 'function') jesusRenderStudyQuestions();
@@ -5306,37 +5295,25 @@ window.addEventListener('DOMContentLoaded', function() {
 
     <!-- Who We Are -->
     <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label" style="text-align:center;margin-bottom:0.6rem;">Who We Are</div>
+      <div class="planner-label" style="text-align:center;margin-bottom:0.6rem;font-size:0.8rem;">Who We Are</div>
       <div style="display:flex;gap:0;">
         <div style="flex:1;min-width:0;padding-right:0.7rem;border-right:1px solid #e8e8e5;">
-          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.72rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">Me</div>
-          <textarea id="infp-whoiam" placeholder="Who am I, right now: my personality, my values, what makes me, me..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;"></textarea>
-          <div style="margin-top:0.4rem;text-align:center;">
-            <button onclick="infpSaveEntry('whoiam')" style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.22rem 0.6rem;cursor:pointer;">Save</button>
-          </div>
+          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">Me</div>
+          <textarea id="infp-whoiam" placeholder="Who am I, right now: my personality, my values, what makes me, me..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'whoiam\')"></textarea>
           <div id="infp-whoiam-entries" style="margin-top:0.6rem;"></div>
           <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
-            <div style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
-            <textarea id="infp-whoiamnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;"></textarea>
-            <div style="text-align:center;">
-              <button onclick="infpSaveEntry('whoiamnotes')" style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.18rem 0.5rem;cursor:pointer;">Save</button>
-            </div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
+            <textarea id="infp-whoiamnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'whoiamnotes\')"></textarea>
             <div id="infp-whoiamnotes-entries" style="margin-top:0.4rem;"></div>
           </div>
         </div>
         <div style="flex:1;min-width:0;padding-left:0.7rem;">
-          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.72rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">Him</div>
-          <textarea id="infp-whoheis" placeholder="Who is he, right now: his personality, his values, what makes him, him..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;"></textarea>
-          <div style="margin-top:0.4rem;text-align:center;">
-            <button onclick="infpSaveEntry('whoheis')" style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.22rem 0.6rem;cursor:pointer;">Save</button>
-          </div>
+          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">Him</div>
+          <textarea id="infp-whoheis" placeholder="Who is he, right now: his personality, his values, what makes him, him..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'whoheis\')"></textarea>
           <div id="infp-whoheis-entries" style="margin-top:0.6rem;"></div>
           <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
-            <div style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
-            <textarea id="infp-whoheisnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;"></textarea>
-            <div style="text-align:center;">
-              <button onclick="infpSaveEntry('whoheisnotes')" style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.18rem 0.5rem;cursor:pointer;">Save</button>
-            </div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
+            <textarea id="infp-whoheisnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'whoheisnotes\')"></textarea>
             <div id="infp-whoheisnotes-entries" style="margin-top:0.4rem;"></div>
           </div>
         </div>
@@ -5345,37 +5322,25 @@ window.addEventListener('DOMContentLoaded', function() {
 
     <!-- Our Problems & Traumas -->
     <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label" style="text-align:center;margin-bottom:0.6rem;">Our Problems & Traumas</div>
+      <div class="planner-label" style="text-align:center;margin-bottom:0.6rem;font-size:0.8rem;">Our Problems & Traumas</div>
       <div style="display:flex;gap:0;">
         <div style="flex:1;min-width:0;padding-right:0.7rem;border-right:1px solid #e8e8e5;">
-          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.72rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">Mine</div>
-          <textarea id="infp-problems" placeholder="What am I carrying: my patterns, wounds, or triggers..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;"></textarea>
-          <div style="margin-top:0.4rem;text-align:center;">
-            <button onclick="infpSaveEntry('problems')" style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.22rem 0.6rem;cursor:pointer;">Save</button>
-          </div>
+          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">Mine</div>
+          <textarea id="infp-problems" placeholder="What am I carrying: my patterns, wounds, or triggers..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'problems\')"></textarea>
           <div id="infp-problems-entries" style="margin-top:0.6rem;"></div>
           <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
-            <div style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
-            <textarea id="infp-problemsnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;"></textarea>
-            <div style="text-align:center;">
-              <button onclick="infpSaveEntry('problemsnotes')" style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.18rem 0.5rem;cursor:pointer;">Save</button>
-            </div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
+            <textarea id="infp-problemsnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'problemsnotes\')"></textarea>
             <div id="infp-problemsnotes-entries" style="margin-top:0.4rem;"></div>
           </div>
         </div>
         <div style="flex:1;min-width:0;padding-left:0.7rem;">
-          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.72rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">His</div>
-          <textarea id="infp-problemshis" placeholder="What is he carrying: his patterns, wounds, or triggers..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;"></textarea>
-          <div style="margin-top:0.4rem;text-align:center;">
-            <button onclick="infpSaveEntry('problemshis')" style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.22rem 0.6rem;cursor:pointer;">Save</button>
-          </div>
+          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">His</div>
+          <textarea id="infp-problemshis" placeholder="What is he carrying: his patterns, wounds, or triggers..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'problemshis\')"></textarea>
           <div id="infp-problemshis-entries" style="margin-top:0.6rem;"></div>
           <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
-            <div style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
-            <textarea id="infp-problemshisnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;"></textarea>
-            <div style="text-align:center;">
-              <button onclick="infpSaveEntry('problemshisnotes')" style="font-family:'Nunito',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.18rem 0.5rem;cursor:pointer;">Save</button>
-            </div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
+            <textarea id="infp-problemshisnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'problemshisnotes\')"></textarea>
             <div id="infp-problemshisnotes-entries" style="margin-top:0.4rem;"></div>
           </div>
         </div>
@@ -5384,20 +5349,16 @@ window.addEventListener('DOMContentLoaded', function() {
 
     <!-- How We Can Solve It -->
     <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">How We Can Solve It</div>
-      <textarea id="infp-solutions" placeholder="What could help? What are we willing to try, ask for, or change..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
-      <div style="margin-top:0.4rem;">
-        <button onclick="infpSaveEntry('solutions')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
-      </div>
+      <div class="planner-label" style="font-size:0.8rem;">How We Can Solve It</div>
+      <textarea id="infp-solutions" placeholder="What could help? What are we willing to try, ask for, or change..." onblur="infpSaveEntry('solutions')" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
       <div id="infp-solutions-entries" style="margin-top:0.6rem;"></div>
     </div>
 
     <!-- Notes -->
     <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">Notes & Reflections</div>
-      <textarea id="infp-notes" placeholder="Write your thoughts, feelings, ideas..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
+      <div class="planner-label" style="font-size:0.8rem;">Notes & Reflections</div>
+      <textarea id="infp-notes" placeholder="Write your thoughts, feelings, ideas..." onblur="infpSaveEntry('notes')" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
       <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
-        <button onclick="infpSaveEntry('notes')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
         <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
           + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('notes',this)" style="display:none;">
         </label>
@@ -5418,7 +5379,6 @@ window.addEventListener('DOMContentLoaded', function() {
           </div>
           <div id="intj-day-modal-hearts"></div>
           <div id="intj-day-modal-extra"></div>
-          <button onclick="intjSaveDayModal()" style="margin-top:0.7rem;font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;">Save</button>
         </div>
       </div>
 
@@ -6398,7 +6358,11 @@ window.addEventListener('DOMContentLoaded', function() {
 <script>
 // -- JESUS CHRIST ---------------------------------------------
 var JESUS_KEY = 'jesus_data';
-var jesusCurrentDate = new Date().toISOString().split('T')[0];
+function jesusLocalDateStr(d) {
+  d = d || new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+var jesusCurrentDate = jesusLocalDateStr();
 var jesusCalOffset = 0;
 var jesusData = {};
 
@@ -6443,7 +6407,7 @@ function jesusUpdateDayLabel() {
   var el = document.getElementById('jesus-day-label');
   if (!el) return;
   var d = new Date(jesusCurrentDate + 'T00:00:00');
-  var today = new Date().toISOString().split('T')[0];
+  var today = jesusLocalDateStr();
   var full = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
   el.textContent = jesusCurrentDate === today ? full + ' · Today' : full;
 }
@@ -6451,7 +6415,7 @@ function jesusUpdateDayLabel() {
 function jesusChangeDay(dir) {
   var d = new Date(jesusCurrentDate + 'T00:00:00');
   d.setDate(d.getDate() + dir);
-  jesusCurrentDate = d.toISOString().split('T')[0];
+  jesusCurrentDate = jesusLocalDateStr(d);
   var now = new Date();
   var selDate = new Date(jesusCurrentDate + 'T00:00:00');
   jesusCalOffset = (selDate.getFullYear() - now.getFullYear()) * 12 + (selDate.getMonth() - now.getMonth());
@@ -6490,7 +6454,7 @@ function renderJesusCal() {
   var now = new Date();
   var base = new Date(now.getFullYear(), now.getMonth() + jesusCalOffset, 1);
   var year = base.getFullYear(), month = base.getMonth();
-  var todayStr = now.toISOString().split('T')[0];
+  var todayStr = jesusLocalDateStr(now);
   lbl.textContent = base.toLocaleDateString('en-US',{month:'long',year:'numeric'});
   var dayNames = ['S','M','T','W','T','F','S'];
   if (dayNamesEl) dayNamesEl.innerHTML = dayNames.map(function(n){
@@ -6960,7 +6924,7 @@ function jesusSaveStudyQuestion() {
   var text = inp.value.trim(); if (!text) return;
   if (!jesusData.studyQuestions) jesusData.studyQuestions = [];
   jesusData.studyQuestions.push({ id: Date.now(), text: text, answered: false, date: new Date().toISOString() });
-  inp.value = ''; jesusSave(); jesusRenderStudyQuestions(true); renderJesusCal();
+  inp.value = ''; inp.style.height = 'auto'; jesusSave(); jesusRenderStudyQuestions(true); renderJesusCal();
 }
 function jesusToggleStudyQuestion(id) {
   jesusData.studyQuestions = (jesusData.studyQuestions||[]).map(function(x){ return x.id===id?{...x,answered:!x.answered}:x; });
@@ -7007,12 +6971,12 @@ function jesusRenderStudyQuestions(skipLoad) {
     return '<div style="padding:0.6rem 0;border-bottom:1px solid #f0f0ee;">' +
       '<div style="display:flex;align-items:center;gap:0.7rem;">' +
         '<div style="font-family:\'Nunito\',sans-serif;font-size:0.9rem;font-weight:300;color:var(--gray);flex-shrink:0;min-width:1.2em;">' + (idx+1) + '.</div>' +
-        '<div style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;font-style:italic;color:var(--black);'+(x.answered?'color:var(--gray);':'')+'">'+x.text+'</div>' +
+        '<div style="flex:1;min-width:0;overflow-wrap:break-word;font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;font-style:italic;color:var(--black);'+(x.answered?'color:var(--gray);':'')+'">'+x.text+'</div>' +
         (x.answered ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);flex-shrink:0;white-space:nowrap;">Answered</div>' : '') +
         '<button onclick="jesusDeleteStudyQuestion('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1.15rem;cursor:pointer;padding:0;flex-shrink:0;">\u00d7</button>' +
       '</div>' +
       '<div style="padding-left:38px;margin-top:0.35rem;">' +
-        '<input id="jesus-q-answer-'+x.id+'" value="'+answerVal+'" placeholder="Write the answer God gave you…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}" oninput="jesusQuestionAnswerInput('+x.id+',this)" onblur="jesusSaveQuestionAnswer('+x.id+',this)" style="width:100%;border:none;border-bottom:1px solid #eee;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--gray);outline:none;padding:0.2rem 0;box-sizing:border-box;">' +
+        '<textarea id="jesus-q-answer-'+x.id+'" rows="1" placeholder="Write the answer God gave you…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}" oninput="jesusAutoGrow(this);jesusQuestionAnswerInput('+x.id+',this)" onblur="jesusSaveQuestionAnswer('+x.id+',this)" style="width:100%;border:none;border-bottom:1px solid #eee;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--gray);outline:none;padding:0.2rem 0;box-sizing:border-box;resize:none;overflow:hidden;">'+answerVal+'</textarea>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -7024,12 +6988,26 @@ function jesusRenderStudyQuestions(skipLoad) {
     '<div style="display:flex;align-items:center;gap:0.7rem;">' +
       '<div style="font-family:\'Nunito\',sans-serif;font-size:0.9rem;font-weight:300;color:var(--gray);flex-shrink:0;min-width:1.2em;">' + nextNum + '.</div>' +
       '<div style="width:16px;flex-shrink:0;"></div>' +
-      '<input id="jesus-study-question-input" placeholder="I want to understand…" onkeydown="if(event.key===\'Enter\')jesusSaveStudyQuestion()" style="flex:1;border:none;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--black);outline:none;padding:0;">' +
+      '<textarea id="jesus-study-question-input" rows="1" placeholder="I want to understand…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();jesusSaveStudyQuestion();}" oninput="jesusAutoGrow(this)" style="flex:1;border:none;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--black);outline:none;padding:0;resize:none;overflow:hidden;"></textarea>' +
       '<div style="width:1.15rem;flex-shrink:0;"></div>' +
     '</div>' +
   '</div>';
 
   el.innerHTML = rows + nextRow;
+
+  // Auto-size every textarea in this section so pre-filled text wraps and
+  // the box shows its full content on render, not just on next keystroke.
+  Array.prototype.forEach.call(el.querySelectorAll('textarea'), function(ta) {
+    jesusAutoGrow(ta);
+  });
+}
+
+// Grows a textarea's height to fit its content so text wraps downward
+// instead of scrolling horizontally.
+function jesusAutoGrow(el) {
+  if (!el) return;
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
 }
 
 function showJesusPrayWordTab(tab) {
@@ -12683,7 +12661,7 @@ function intjModalPeriodRow(period, label, dayAbbr, checked, noteVal) {
     + '<span onclick="intjModalToggleHeart(\'' + period + '\')" style="cursor:pointer;margin-top:0.15rem;flex-shrink:0;">' + intjHeartIcon(checked) + '</span>'
     + '<div style="flex:1;">'
     + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-bottom:0.25rem;">' + label + '</div>'
-    + '<textarea id="intj-day-modal-note-' + period + '" placeholder="What happened…" rows="2" style="width:100%;border:none;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;outline:none;padding:0.25rem 0;box-sizing:border-box;resize:vertical;line-height:1.5;overflow-wrap:break-word;">' + escaped + '</textarea>'
+    + '<textarea id="intj-day-modal-note-' + period + '" placeholder="What happened…" rows="2" onblur="intjSavePeriodNote(_intjModalKey,\'' + period + '\',this.value)" style="width:100%;border:none;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;outline:none;padding:0.25rem 0;box-sizing:border-box;resize:vertical;line-height:1.5;overflow-wrap:break-word;">' + escaped + '</textarea>'
     + '</div>'
     + '</div>';
 }
