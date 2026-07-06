@@ -6527,7 +6527,7 @@ function jesusCJump(date) {
       + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;">'+label+'</div>'
       + items.map(function(x){
           var done = x.done || x.answered;
-          return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:'+(done?'#bbb':'var(--black)')+';line-height:1.6;'+(done?'text-decoration:line-through;':'')+'">'+(done?'✓ ':'· ')+getText(x)+'</div>';
+          return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:'+(done?'#bbb':'var(--black)')+';line-height:1.6;white-space:pre-wrap;'+(done?'text-decoration:line-through;':'')+'">'+(done?'✓ ':'· ')+getText(x)+'</div>';
         }).join('')
       + '</div>');
   }
@@ -6889,7 +6889,7 @@ function jesusSaveStudyNote() {
     verseHtml = reader.firstElementChild.children[1].innerHTML;
   }
   if (!jesusData.studyNotes) jesusData.studyNotes = [];
-  jesusData.studyNotes.unshift({ id: Date.now(), passage: passage, note: note, verseHtml: verseHtml, date: new Date().toISOString() });
+  jesusData.studyNotes.push({ id: Date.now(), passage: passage, note: note, verseHtml: verseHtml, date: new Date().toISOString() });
   document.getElementById('jesus-study-passage').value = '';
   document.getElementById('jesus-study-note').value = '';
   if (reader) { reader.style.display = 'none'; reader.innerHTML = ''; }
@@ -6904,7 +6904,7 @@ function jesusDeleteStudyNote(id) {
 function jesusRenderStudyNotes(skipLoad) {
   if (!skipLoad) jesusLoad();
   var el = document.getElementById('jesus-study-notes-list'); if (!el) return;
-  var items = jesusData.studyNotes || [];
+  var items = (jesusData.studyNotes || []).slice().sort(function(a, b) { return (a.id || 0) - (b.id || 0); });
   if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.88rem;color:#ccc;padding:0.3rem 0;">No notes yet.</div>'; return; }
   el.innerHTML = items.map(function(x) {
     var dl = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
