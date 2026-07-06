@@ -6194,7 +6194,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <div id="jesus-cal-grid"></div>
         </div>
         <!-- Day summary (shown after tapping a date) -->
-        <div id="jesus-cal-summary" style="display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0;">
+        <div id="jesus-cal-summary" style="display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0;text-align:left;">
           <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;flex-shrink:0;">
             <button onclick="jesusCalShowGrid()" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0;line-height:1;">&#8249;</button>
             <div id="jesus-cal-summary-date" style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--black);"></div>
@@ -7133,9 +7133,8 @@ function jesusRenderCheckList(items, toggleFn, deleteFn) {
     var dateStr = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
     return '<div style="padding:0.5rem 0;border-bottom:1px solid #f0f0ee;">' +
       '<div style="display:flex;align-items:center;gap:0.6rem;">' +
-        '<div style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.92rem;font-weight:300;color:var(--black);'+(x.done?'color:var(--gray);':'')+'">' + x.text + '</div>' +
         '<div onclick="'+toggleFn+'('+x.id+')" style="width:14px;height:14px;border:1px solid '+(x.done?'var(--black)':'#c8c8c5')+';background:'+(x.done?'var(--black)':'transparent')+';cursor:pointer;flex-shrink:0;"></div>' +
-        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);flex-shrink:0;white-space:nowrap;min-width:2.8em;visibility:'+(x.done?'visible':'hidden')+';">Done</div>' +
+        '<div style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.92rem;font-weight:300;color:var(--black);'+(x.done?'color:var(--gray);':'')+'">' + x.text + '</div>' +
         '<button onclick="'+deleteFn+'('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;margin-left:0.4rem;">×</button>' +
       '</div>' +
       (dateStr ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;margin-top:0.2rem;padding-left:20px;">' + dateStr + '</div>' : '') +
