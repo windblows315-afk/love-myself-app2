@@ -630,7 +630,20 @@
     .scale-wrap { padding: 0.8rem; }
     textarea { font-size: 0.9rem; min-height: 90px; }
     .balance-side-grid { grid-template-columns: 1fr !important; }
-    .planner-two-col { grid-template-columns: 1fr !important; }
+    .planner-two-col { grid-template-columns: 1.7fr 1fr !important; gap: 0.4rem !important; }
+    #ps-schedule, #ps-daily > div { padding: 0.5rem !important; }
+    #ps-daily .planner-label { font-size: 0.55rem !important; }
+    #ps-schedule .time-label { font-size: 0.58rem !important; padding: 0.35rem 0.15rem 0 0 !important; }
+    #ps-schedule .time-input { font-size: 0.72rem !important; }
+    #schedule-time-rows span[style*="font-size:0.82rem"] { font-size: 0.72rem !important; }
+    #sched-mood-row { gap: 0.25rem !important; }
+    #sched-mood-row .mood-btn { font-size: 0.56rem !important; padding: 0.22rem 0.35rem !important; }
+    #sched-sleep-row { flex-wrap: wrap !important; gap: 0.3rem !important; justify-content: flex-start !important; }
+    .sleep-btn { width: 20px !important; height: 20px !important; font-size: 0.58rem !important; }
+    #sched-water-row { flex-wrap: wrap !important; justify-content: flex-start !important; gap: 0.5rem 0.4rem !important; }
+    #sched-water-row .water-cup { font-size: 0.85rem !important; }
+    #sched-water-row span[style*="font-size:0.65rem"] { font-size: 0.55rem !important; }
+    #ps-daily input, #ps-daily textarea { font-size: 0.72rem !important; }
     #vision h2 { font-size: 0.82rem !important; margin-bottom: 0.3rem; }
     #vision .subtitle { font-size: 0.6rem !important; margin-bottom: 0.3rem; }
     #vision [style*="font-size:0.95rem"] { font-size: 0.78rem !important; margin-bottom: 0.8rem; }
@@ -1016,7 +1029,7 @@ window.addEventListener('error', function(e) {
             <div class="planner-label">Sleep (hrs)</div>
             <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">9:00 PM</span>
           </div>
-          <div style="display:flex;justify-content:space-between;margin-top:0.5rem;">
+          <div id="sched-sleep-row" style="display:flex;justify-content:space-between;margin-top:0.5rem;">
             <span class="sleep-btn" onclick="schedDailySetSleep(this,4)">4</span>
             <span class="sleep-btn" onclick="schedDailySetSleep(this,5)">5</span>
             <span class="sleep-btn" onclick="schedDailySetSleep(this,6)">6</span>
@@ -1030,7 +1043,7 @@ window.addEventListener('error', function(e) {
         <!-- Water -->
         <div style="border:1px solid #c8c8c5;padding:0.8rem;">
           <div class="planner-label">Water</div>
-          <div style="display:flex;gap:0.2rem;margin-top:0.5rem;justify-content:space-between;">
+          <div id="sched-water-row" style="display:flex;gap:0.2rem;margin-top:0.5rem;justify-content:space-between;">
             <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-0" onclick="schedDailyToggleWater(this,0)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">7 AM</span></div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-1" onclick="schedDailyToggleWater(this,1)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">8 AM</span></div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-2" onclick="schedDailyToggleWater(this,2)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">9 AM</span></div>
@@ -2240,13 +2253,13 @@ function renderSchedule() {
   const day = getPlannerDay();
   const schedule = day.schedule || {};
   const slots = [
-    '6:30 AM','7:00 AM',
+    '4:00 AM','4:30 AM','5:00 AM','5:30 AM','6:00 AM','6:30 AM','7:00 AM',
     '7:30 AM','8:00 AM','8:30 AM','9:00 AM','9:30 AM',
     '10:00 AM','10:30 AM','11:00 AM','11:30 AM','12:00 PM',
     '12:30 PM','1:00 PM','1:30 PM','2:00 PM','2:30 PM',
     '3:00 PM','3:30 PM','4:00 PM','4:30 PM','5:00 PM',
     '5:30 PM','6:00 PM','6:30 PM','7:00 PM','7:30 PM',
-    '8:00 PM','8:30 PM','9:00 PM'
+    '8:00 PM','8:30 PM','9:00 PM','9:30 PM','10:00 PM'
   ];
 
   // Default permanent items per slot
@@ -2472,13 +2485,14 @@ function renderTeFiVerdict() {
   }
 
   const ratio = te / total;
-  let lead, body;
+  let lead, body, bodyExtra = '';
   if (total < 2) {
     lead = 'Keep tagging';
     body = 'Add a couple more entries to get a read on today.';
   } else if (ratio >= 0.6) {
-    lead = 'Lean toward rest';
-    body = 'Mostly Te today: organizing, deciding, pushing things through. That\'s your inferior function working hard. Give yourself space to drop into Fi, alone time, something that just feels right, no agenda.';
+    lead = 'Lean toward <b>rest</b>';
+    body = 'Mostly Te today: organizing, deciding, pushing things through. That\'s your inferior function working hard.';
+    bodyExtra = 'Give yourself space to drop into Fi, alone time, something that just feels right, no agenda.';
   } else if (ratio <= 0.35) {
     lead = 'You have room to do more / use Te';
     body = 'Mostly Fi today: values, feelings, reflecting. You\'re likely not drained in the way Te-heavy days drain you — a good window to tackle a task that needs structure or follow-through.';
@@ -2491,8 +2505,9 @@ function renderTeFiVerdict() {
     '<div style="display:flex;gap:1rem;font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">' +
       '<span>Te <b style="color:var(--black);">' + te + '</b></span><span>Fi <b style="color:var(--black);">' + fi + '</b></span><span>Total <b style="color:var(--black);">' + total + '</b></span>' +
     '</div>' +
-    '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.88rem;color:var(--black);margin-bottom:0.2rem;">' + lead + '</div>' +
+    '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.88rem;color:var(--black);margin-bottom:0.5rem;">' + lead + '</div>' +
     '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;line-height:1.5;color:var(--black);">' + body + '</div>' +
+    (bodyExtra ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;line-height:1.5;color:var(--black);margin-top:0.5rem;">' + bodyExtra + '</div>' : '') +
   '</div>';
 }
 
