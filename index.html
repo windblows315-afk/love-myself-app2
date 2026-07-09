@@ -636,14 +636,27 @@
     #ps-schedule .time-label { font-size: 0.68rem !important; padding: 0.35rem 0.3rem 0 0 !important; }
     #ps-schedule .time-input { font-size: 0.8rem !important; }
     #schedule-time-rows span[style*="font-size:0.82rem"] { font-size: 0.82rem !important; }
-    #sched-mood-row { gap: 0.25rem !important; }
-    #sched-mood-row .mood-btn { font-size: 0.56rem !important; padding: 0.22rem 0.35rem !important; }
-    #sched-sleep-row { flex-wrap: wrap !important; gap: 0.3rem !important; justify-content: flex-start !important; }
-    .sleep-btn { width: 20px !important; height: 20px !important; font-size: 0.58rem !important; }
-    #sched-water-row { flex-wrap: wrap !important; justify-content: flex-start !important; gap: 0.5rem 0.4rem !important; }
-    #sched-water-row .water-cup { font-size: 0.85rem !important; }
-    #sched-water-row span[style*="font-size:0.65rem"] { font-size: 0.55rem !important; }
+    #sched-mood-row { gap: 0.4rem !important; }
+    #sched-mood-row .mood-btn { font-size: 0.72rem !important; padding: 0.4rem 0.65rem !important; }
+    #sched-sleep-row { flex-wrap: wrap !important; gap: 0.5rem !important; justify-content: flex-start !important; }
+    .sleep-btn { width: 32px !important; height: 32px !important; font-size: 0.78rem !important; }
+    #sched-water-row { flex-wrap: wrap !important; justify-content: flex-start !important; gap: 0.7rem 0.6rem !important; }
+    #sched-water-row .water-cup { font-size: 1.3rem !important; }
+    #sched-water-row span[style*="font-size:0.65rem"] { font-size: 0.68rem !important; }
     #ps-daily input, #ps-daily textarea { font-size: 0.72rem !important; }
+    /* To Do — sized up now that the panel isn't squished */
+    #todo-list > div { padding: 0.55rem 0 !important; }
+    #todo-list div[style*="font-size:0.82rem"] { font-size: 0.9rem !important; }
+    #todo-input { font-size: 0.9rem !important; }
+    /* Meals, Notes, Photos — sized up now that the panel isn't squished */
+    #sched-daily-breakfast-list div, #sched-daily-lunch-list div, #sched-daily-dinner-list div,
+    #sched-daily-snacks-list div, #sched-daily-drinks-list div { font-size: 0.85rem !important; padding: 0.3rem 0 !important; }
+    #ps-notes input, #ps-notes textarea { font-size: 0.85rem !important; }
+    #sched-notes-list { font-size: 0.85rem !important; }
+    #sched-notes-list > div { padding: 0.7rem 0 !important; }
+    #ps-photos .home-link, #ps-photos label { font-size: 0.7rem !important; padding: 0.4rem 0.9rem !important; }
+    #sched-photos-list > div > div { width: 100px !important; height: 100px !important; }
+    #sched-photos-list img { width: 100px !important; height: 100px !important; }
     #vision h2 { font-size: 0.82rem !important; margin-bottom: 0.3rem; }
     #vision .subtitle { font-size: 0.6rem !important; margin-bottom: 0.3rem; }
     #vision [style*="font-size:0.95rem"] { font-size: 0.78rem !important; margin-bottom: 0.8rem; }
@@ -1014,7 +1027,7 @@ window.addEventListener('error', function(e) {
         <!-- Mood -->
         <div style="border:1px solid #c8c8c5;padding:0.8rem;">
           <div class="planner-label">Mood</div>
-          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
+          <div id="sched-mood-row" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
             <span class="mood-btn" onclick="schedDailyToggleMood(this,'Great')">Great</span>
             <span class="mood-btn" onclick="schedDailyToggleMood(this,'Good')">Good</span>
             <span class="mood-btn" onclick="schedDailyToggleMood(this,'Okay')">Okay</span>
@@ -2247,33 +2260,76 @@ function showSchedCalSummary(dateStr) {
 }
 
 // ── Android native alarm hand-off ──
-// Converts a slot label like "4:30 PM" into 24h {hour, minute}
-function scheduleSlotTo24h(slot) {
+// Converts a slot label like "4:30 PM" into 24h "HH:MM" string
+function scheduleSlotToHHMM(slot) {
   var m = slot.match(/(\d+):(\d+)\s*(AM|PM)/i);
-  if (!m) return null;
+  if (!m) return '';
   var hour = parseInt(m[1], 10);
   var minute = parseInt(m[2], 10);
   var ampm = m[3].toUpperCase();
   if (ampm === 'PM' && hour !== 12) hour += 12;
   if (ampm === 'AM' && hour === 12) hour = 0;
-  return { hour: hour, minute: minute };
+  return String(hour).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
 }
 
-// Opens the Android Clock app's "set alarm" screen, pre-filled with time + label.
+// Fires the Android Clock app's "set alarm" screen, pre-filled with time + label.
 // Requires one tap on "Save" in the Clock app to actually create the alarm —
 // no web page can silently add a system alarm without that native confirmation.
-function scheduleSetAndroidAlarm(slot, label) {
-  var t = scheduleSlotTo24h(slot);
-  if (!t) return;
-  var msg = encodeURIComponent(label || slot);
+// hour24 is 0-23, minute is 0-59.
+function scheduleFireAndroidAlarm(hour24, minute, label) {
+  var msg = encodeURIComponent(label || 'Reminder');
   var intentUrl = 'intent:#Intent;action=android.intent.action.SET_ALARM;' +
     'S.android.intent.extra.alarm.MESSAGE=' + msg + ';' +
-    'i.android.intent.extra.alarm.HOUR=' + t.hour + ';' +
-    'i.android.intent.extra.alarm.MINUTES=' + t.minute + ';' +
+    'i.android.intent.extra.alarm.HOUR=' + hour24 + ';' +
+    'i.android.intent.extra.alarm.MINUTES=' + minute + ';' +
     'end';
-  try {
-    window.location.href = intentUrl;
-  } catch (e) {}
+  window.location.href = intentUrl;
+}
+
+// Saves the chosen alarm time ("HH:MM", 24h, from <input type="time">) onto a schedule item.
+function setScheduleItemAlarmTime(key, id, value) {
+  const dayKey = getDateKey();
+  const items = allPlannerData[dayKey]?.schedule?.[key]?.items;
+  if (!items) return;
+  const item = items.find(x => x.id == id);
+  if (!item) return;
+  item.alarmTime = value;
+  saveScheduleFast();
+  renderSchedule();
+}
+
+// Fires the native alarm hand-off using the item's chosen time, or the slot's own time by default.
+function fireScheduleItemAlarm(key, id) {
+  const dayKey = getDateKey();
+  const items = allPlannerData[dayKey]?.schedule?.[key]?.items;
+  const item = items && items.find(x => x.id == id);
+  if (!item) return;
+  const t = item.alarmTime || scheduleSlotToHHMM(key.replace(/_/g, ' '));
+  if (!t) return;
+  const parts = t.split(':');
+  scheduleFireAndroidAlarm(parseInt(parts[0], 10), parseInt(parts[1], 10), item.text);
+}
+
+// Saves a custom alarm time for a default item (Cook Lunch, Eat Lunch, Cook Dinner, Eat Dinner).
+function setDefaultItemAlarmTime(key, di, value) {
+  const dayKey = getDateKey();
+  if (!allPlannerData[dayKey]) allPlannerData[dayKey] = {};
+  if (!allPlannerData[dayKey].schedule) allPlannerData[dayKey].schedule = {};
+  if (!allPlannerData[dayKey].schedule[key]) allPlannerData[dayKey].schedule[key] = {};
+  if (!allPlannerData[dayKey].schedule[key].defaultAlarmTime) allPlannerData[dayKey].schedule[key].defaultAlarmTime = {};
+  allPlannerData[dayKey].schedule[key].defaultAlarmTime[di] = value;
+  saveScheduleFast();
+  renderSchedule();
+}
+
+// Fires the native alarm hand-off for a default item, using its chosen time or the slot's own time.
+function fireDefaultItemAlarm(key, di, text) {
+  const dayKey = getDateKey();
+  const entry = allPlannerData[dayKey]?.schedule?.[key] || {};
+  const t = (entry.defaultAlarmTime && entry.defaultAlarmTime[di]) || scheduleSlotToHHMM(key.replace(/_/g, ' '));
+  if (!t) return;
+  const parts = t.split(':');
+  scheduleFireAndroidAlarm(parseInt(parts[0], 10), parseInt(parts[1], 10), text);
 }
 
 // Schedule time rows
@@ -2382,6 +2438,7 @@ function renderSchedule() {
     return parts.join('');
   }
 
+  var _typeBackfilled = false;
   el.innerHTML = slots.map(slot => {
     const key = slot.replace(/\s/g,'_');
     const entry = schedule[key] || {};
@@ -2390,15 +2447,27 @@ function renderSchedule() {
     else if (typeof entry === 'string' && entry) userItems = [{id: key+'_0', text: entry, done: false}];
     else if (entry.text) userItems = [{id: key+'_0', text: entry.text, done: entry.done||false}];
 
+    // Auto-classify te/fi for any item that already has text but was never tagged
+    // (covers items typed before this feature existed, or synced from older data).
+    userItems.forEach(function(it) {
+      if (it.type === undefined) {
+        it.type = classifyScheduleItemType(it.text);
+        _typeBackfilled = true;
+      }
+    });
+
     const defaults = DEFAULTS[key] || [];
     const defaultChecked = entry.defaultDone || {};
     const defaultRemoved = entry.defaultRemoved || {};
+
+    const defaultAlarmTimes = entry.defaultAlarmTime || {};
 
     const defaultHtml = defaults.map((text, di) => {
       if (defaultRemoved[di]) return '';
       const done = defaultChecked[di] || false;
       const dType = classifyScheduleItemType(text);
-      return '<div style="display:flex;align-items:flex-start;gap:0.3rem;padding:0.1rem 0;">' +
+      return '<div style="padding:0.1rem 0;">' +
+        '<div style="display:flex;align-items:flex-start;gap:0.3rem;">' +
         '<div onclick="event.stopPropagation();toggleDefaultItem(\'' + key + '\',' + di + ')" style="width:12px;height:12px;border-radius:50%;border:1px solid ' + (done?'var(--black)':'#c8c8c5') + ';background:' + (done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:0.2rem;">' +
           (done?'<svg width="7" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="white" stroke-width="1.5"/></svg>':'') +
         '</div>' +
@@ -2407,11 +2476,19 @@ function renderSchedule() {
           : '') +
         '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;' + (done?'color:var(--gray);text-decoration:line-through;':'') + '">' + text + '</span>' +
         '<button onclick="event.stopPropagation();removeDefaultItem(\'' + key + '\',' + di + ')" style="font-size:0.7rem;color:#bbb;border:none;background:none;cursor:pointer;flex-shrink:0;padding:0 0.2rem;">✕</button>' +
+        '</div>' +
+        '<div onclick="event.stopPropagation();" style="display:flex;align-items:center;gap:0.2rem;margin-top:0.2rem;padding-left:1.4rem;">' +
+          '<input type="time" value="' + (defaultAlarmTimes[di] || scheduleSlotToHHMM(slot)) + '" ' +
+            'onchange="setDefaultItemAlarmTime(\'' + key + '\',' + di + ',this.value)" ' +
+            'style="border:1px solid #e0e0dd;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.68rem;color:var(--gray);padding:0.1rem 0.2rem;">' +
+          '<span onclick="fireDefaultItemAlarm(\'' + key + '\',' + di + ',' + JSON.stringify(text).replace(/"/g, '&quot;') + ')" title="Set phone alarm" style="cursor:pointer;font-size:0.8rem;line-height:1;opacity:0.7;">⏰</span>' +
+        '</div>' +
       '</div>';
     }).join('');
 
     const itemsHtml = userItems.map((item) =>
-      '<div style="display:flex;align-items:flex-start;gap:0.3rem;padding:0.1rem 0;">' +
+      '<div style="padding:0.1rem 0;">' +
+        '<div style="display:flex;align-items:flex-start;gap:0.3rem;">' +
         '<div onclick="event.stopPropagation();toggleScheduleItem(\'' + key + '\',' + item.id + ')" style="width:12px;height:12px;border-radius:50%;border:1px solid ' + (item.done?'var(--black)':'#c8c8c5') + ';background:' + (item.done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:0.2rem;">' +
           (item.done?'<svg width="7" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="white" stroke-width="1.5"/></svg>':'') +
         '</div>' +
@@ -2421,19 +2498,17 @@ function renderSchedule() {
         '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;' + (item.done?'color:var(--gray);text-decoration:line-through;':'') + '">' + item.text + '</span>' +
         (item.savedAt ? '<span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray);flex-shrink:0;margin-right:0.2rem;">' + item.savedAt + '</span>' : '') +
         '<button onclick="event.stopPropagation();removeScheduleItem(\'' + key + '\',' + item.id + ')" style="font-size:0.7rem;color:#bbb;border:none;background:none;cursor:pointer;flex-shrink:0;padding:0 0.2rem;">✕</button>' +
+        '</div>' +
+        '<div onclick="event.stopPropagation();" style="display:flex;align-items:center;gap:0.2rem;margin-top:0.2rem;padding-left:1.4rem;">' +
+          '<input type="time" id="alarm-time-' + item.id + '" value="' + (item.alarmTime || scheduleSlotToHHMM(slot)) + '" ' +
+            'onchange="setScheduleItemAlarmTime(\'' + key + '\',' + item.id + ',this.value)" ' +
+            'style="border:1px solid #e0e0dd;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.68rem;color:var(--gray);padding:0.1rem 0.2rem;">' +
+          '<span onclick="fireScheduleItemAlarm(\'' + key + '\',' + item.id + ')" title="Set phone alarm" style="cursor:pointer;font-size:0.8rem;line-height:1;opacity:0.7;">⏰</span>' +
+        '</div>' +
       '</div>'
     ).join('');
 
-    const _alarmLabel = defaults.filter(function(t,di){ return !defaultRemoved[di]; })
-      .concat(userItems.map(function(it){ return it.text; }))
-      .join(', ') || slot;
-
-    return '<div class="time-label" style="padding-top:0.35rem;display:flex;align-items:center;gap:0.25rem;">' +
-        '<span>' + slot + '</span>' +
-        '<span onclick="event.stopPropagation();scheduleSetAndroidAlarm(\'' + slot + '\',' + JSON.stringify(_alarmLabel).replace(/"/g, '&quot;') + ')" ' +
-          'title="Set phone alarm for this time" ' +
-          'style="cursor:pointer;font-size:0.7rem;line-height:1;opacity:0.55;flex-shrink:0;">⏰</span>' +
-      '</div>' +
+    return '<div class="time-label" style="padding-top:0.35rem;">' + slot + '</div>' +
       '<div style="padding:0.1rem 0 0.3rem;">' +
         defaultHtml +
         itemsHtml +
@@ -2445,19 +2520,31 @@ function renderSchedule() {
       '</div>';
   }).join('');
 
+  if (_typeBackfilled) saveScheduleFast();
   renderTeFiVerdict();
 }
 
 // ── Te/Fi labeling for schedule items ──
 var SCHED_TE_WORDS = ['work','focus','deep work','project','plan','planning','task','goal','meeting',
   'decision','organize','organise','schedule','efficient','efficiency','productivity','deadline',
-  'strategy','system','fix','solve','structure','review','report','budget','errand','chore','clean',
+  'strategy','system','fix','solve','structure','review','report','budget','errand','errands','chore','chores','clean',
   'workout','gym','exercise','study','build','code','email','call','logistics','routine','cook',
-  'wash','brush','bath','bathe','clothed','eat','breakfast','lunch','dinner','calisthenics','drink water'];
+  'wash','brush','bath','bathe','clothed','eat','breakfast','lunch','dinner','calisthenics','drink water',
+  'homework','assignment','exam','lecture','coursework','thesis','research paper','presentation','interview','resume',
+  'invoice','taxes','banking','pay bill','pay bills','bills','groceries','grocery','shopping','appointment',
+  'doctor','dentist','checkup','medication','prescription','vitamins','laundry','dishes','vacuum','sweep','mop',
+  'declutter','repair','install','debug','configure','commute','traffic','packing','flight','job'];
 var SCHED_FI_WORDS = ['talk','connect','feel','feeling','feelings','love','heart','recharge','quiet',
   'alone time','journal','emotion','heard','listen','care','bond','together','hug','check in','check-in',
   'vulnerable','share','support','cuddle','affirm','appreciate','gratitude','pray','meditate','read book',
-  'rest','relax','sleep','reflect','God','bible','wake up','good morning','smell fresh air'];
+  'rest','relax','sleep','reflect','God','bible','wake up','good morning','smell fresh air',
+  'message','messages','text','friend','watch','youtube','anime','movie','show','series','netflix',
+  'music','song','playlist','entertainment','leisure','fun','hobby','hobbies','game','gaming','video game',
+  'family','mom','dad','mother','father','sister','brother','parents','grandma','grandpa',
+  'boyfriend','girlfriend','partner','spouse','husband','wife','date night','hangout','hang out','visit',
+  'nap','chill','unwind','spa','walk','hike','hiking','park','nature','beach','garden','gardening',
+  'draw','drawing','paint','painting','craft','crafting','knit','sew','sing','singing','dance','dancing',
+  'photography','therapy','vent','mood','church','worship','faith','birthday','celebrate','celebration','party','gift'];
 
 function classifyScheduleItemType(text) {
   var t = (text || '').toLowerCase();
@@ -2605,7 +2692,7 @@ function addScheduleItem(key, input) {
   const _now = new Date();
   const _timeLabel = _now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   const _type = classifyScheduleItemType(val);
-  items.push({id, text: val, done: false, savedAt: _timeLabel, type: _type});
+  items.push({id, text: val, done: false, savedAt: _timeLabel, type: _type, alarmTime: scheduleSlotToHHMM(key.replace(/_/g, ' '))});
   allPlannerData[dayKey].schedule[key] = { items };
   input.value = '';
   saveScheduleFast();
