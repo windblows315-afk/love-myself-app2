@@ -84,7 +84,7 @@
     'whoi_history','my_books','habit_tracker','cali_log','wia2','wia2aff','wia2q','wia2wq',
     'hlb','hlr','ass_checkin','ass_log','ass_entries_asking','ass_entries_giving',
     'bel_foundation','bel_evidence','bel_failure','belief_beliefs',
-    'balance_data','vision_items','ritual_state','user_rituals',
+    'balance_data','vision_items','smart_goals','ritual_state','user_rituals',
     'bc_habits_data','face_habits_data','daily_data','rfm_data','jesus_data',
     'my_routine_data','routine_todos','routine_notes','routine_photos','wia_photos','bp_data'];
   const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_','rhythm_day_','rhythm_month_','rhythm_year_'];
@@ -936,6 +936,46 @@ window.addEventListener('error', function(e) {
   <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 1.5rem;line-height:1.6;">Build a vision board for every area of your life 🤍</div>
   <div id="vision-board-section" class="vision-board-mount" style="margin-bottom:2rem;"></div>
   <div id="dimension-boards"></div>
+
+  <div style="margin-top:3rem;padding-top:2rem;border-top:1px solid #e8e8e5;">
+    <h2 style="font-family:'Lora',serif;font-size:1.3rem;font-weight:400;margin-bottom:0.3rem;">SMART goal.</h2>
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.4rem 0 1.5rem;line-height:1.6;">Turn a dream into a goal you can actually reach 🤍</div>
+
+    <div style="border:1px solid #c8c8c5;padding:1.2rem;margin-bottom:0.75rem;">
+      <div class="wia-identity-card" style="padding:0 0 0.6rem;margin-bottom:0;text-align:center;min-height:90px;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+        <div class="wia-id-label" style="margin-bottom:2rem;">Your Goal</div>
+        <div class="wia-id-name" id="smartGoalName">...</div>
+        <div class="wia-id-traits" id="smartGoalTags" style="justify-content:center;flex-direction:column;align-items:center;gap:0.3rem;text-align:center;width:100%;"></div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #e8e8e5;margin:1.5rem 0;">
+
+      <div class="subtitle" style="margin-bottom:0.5rem;">Set a New Goal</div>
+      <div class="smart-field">
+        <label class="smart-label">Specific</label>
+        <textarea id="smart-input-specific" rows="2" placeholder="What exactly do you want to accomplish?"></textarea>
+      </div>
+      <div class="smart-field">
+        <label class="smart-label">Measurable</label>
+        <textarea id="smart-input-measurable" rows="2" placeholder="How will you know you got there?"></textarea>
+      </div>
+      <div class="smart-field">
+        <label class="smart-label">Achievable</label>
+        <textarea id="smart-input-achievable" rows="2" placeholder="Is this realistic with what you have?"></textarea>
+      </div>
+      <div class="smart-field">
+        <label class="smart-label">Relevant</label>
+        <textarea id="smart-input-relevant" rows="2" placeholder="Why does this matter to you right now?"></textarea>
+      </div>
+      <div class="smart-field" style="margin-bottom:0.5rem;">
+        <label class="smart-label">Time-Bound</label>
+        <textarea id="smart-input-timebound" rows="2" placeholder="When will this be done by?"></textarea>
+      </div>
+      <button onclick="addSmartGoal()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;">Save Goal</button>
+
+      <div id="smart-goal-history" style="margin-top:0.8rem;"></div>
+    </div>
+  </div>
 
 </div>
 
@@ -2477,12 +2517,6 @@ function renderSchedule() {
         '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;' + (done?'color:var(--gray);text-decoration:line-through;':'') + '">' + text + '</span>' +
         '<button onclick="event.stopPropagation();removeDefaultItem(\'' + key + '\',' + di + ')" style="font-size:0.7rem;color:#bbb;border:none;background:none;cursor:pointer;flex-shrink:0;padding:0 0.2rem;">✕</button>' +
         '</div>' +
-        '<div onclick="event.stopPropagation();" style="display:flex;align-items:center;gap:0.2rem;margin-top:0.2rem;padding-left:1.4rem;">' +
-          '<input type="time" value="' + (defaultAlarmTimes[di] || scheduleSlotToHHMM(slot)) + '" ' +
-            'onchange="setDefaultItemAlarmTime(\'' + key + '\',' + di + ',this.value)" ' +
-            'style="border:1px solid #e0e0dd;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.68rem;color:var(--gray);padding:0.1rem 0.2rem;">' +
-          '<span onclick="fireDefaultItemAlarm(\'' + key + '\',' + di + ',' + JSON.stringify(text).replace(/"/g, '&quot;') + ')" title="Set phone alarm" style="cursor:pointer;font-size:0.8rem;line-height:1;opacity:0.7;">⏰</span>' +
-        '</div>' +
       '</div>';
     }).join('');
 
@@ -2498,12 +2532,6 @@ function renderSchedule() {
         '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;' + (item.done?'color:var(--gray);text-decoration:line-through;':'') + '">' + item.text + '</span>' +
         (item.savedAt ? '<span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray);flex-shrink:0;margin-right:0.2rem;">' + item.savedAt + '</span>' : '') +
         '<button onclick="event.stopPropagation();removeScheduleItem(\'' + key + '\',' + item.id + ')" style="font-size:0.7rem;color:#bbb;border:none;background:none;cursor:pointer;flex-shrink:0;padding:0 0.2rem;">✕</button>' +
-        '</div>' +
-        '<div onclick="event.stopPropagation();" style="display:flex;align-items:center;gap:0.2rem;margin-top:0.2rem;padding-left:1.4rem;">' +
-          '<input type="time" id="alarm-time-' + item.id + '" value="' + (item.alarmTime || scheduleSlotToHHMM(slot)) + '" ' +
-            'onchange="setScheduleItemAlarmTime(\'' + key + '\',' + item.id + ',this.value)" ' +
-            'style="border:1px solid #e0e0dd;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.68rem;color:var(--gray);padding:0.1rem 0.2rem;">' +
-          '<span onclick="fireScheduleItemAlarm(\'' + key + '\',' + item.id + ')" title="Set phone alarm" style="cursor:pointer;font-size:0.8rem;line-height:1;opacity:0.7;">⏰</span>' +
         '</div>' +
       '</div>'
     ).join('');
@@ -3175,6 +3203,10 @@ visionStyle.textContent = `
   .vision-card-word { font-family:'Lora',serif; font-size:1.2rem; font-style:italic; font-weight:400; text-align:center; padding:0.8rem; }
   .vision-card img { width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
   .vision-remove { position:absolute; top:0.5rem; right:0.6rem; font-family:'Nunito',sans-serif; font-size:0.55rem; letter-spacing:0.1em; color:var(--gray); border:none; background:none; cursor:pointer; text-transform:uppercase; }
+  .smart-field { margin-bottom:0.9rem; }
+  .smart-label { display:block; font-family:'Nunito',sans-serif; font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray); margin-bottom:0.3rem; }
+  .smart-field textarea { width:100%; border:none; border-bottom:1px solid #c8c8c5; background:transparent; font-family:'Nunito',sans-serif; font-size:0.88rem; font-weight:300; color:var(--black); outline:none; padding:0.3rem 0; box-sizing:border-box; resize:vertical; line-height:1.5; }
+  .smart-field textarea::placeholder { color:#b8b8b5; font-style:italic; font-family:'Lora',serif; }
 `;
 document.head.appendChild(visionStyle);
 
@@ -3338,6 +3370,101 @@ function renderVisionBoardInto(mountId) {
   setTimeout(function(){ if (typeof _resolveOfflineImages === 'function') _resolveOfflineImages(); }, 0);
 }
 renderVisionBoard(true);
+
+// SMART Goals
+let smartGoals = JSON.parse(localStorage.getItem('smart_goals') || '[]');
+if (!Array.isArray(smartGoals)) smartGoals = [];
+(function _migrateSmartGoalIds() {
+  var changed = false;
+  smartGoals.forEach(function(g) {
+    if (!g.id) { g.id = Date.now() + '-' + Math.random().toString(36).slice(2, 8); changed = true; }
+  });
+  if (changed) localStorage.setItem('smart_goals', JSON.stringify(smartGoals));
+})();
+
+function addSmartGoal() {
+  var fields = ['specific', 'measurable', 'achievable', 'relevant', 'timebound'];
+  var vals = {};
+  var hasContent = false;
+  fields.forEach(function(f) {
+    var el = document.getElementById('smart-input-' + f);
+    vals[f] = el ? el.value.trim() : '';
+    if (vals[f]) hasContent = true;
+  });
+  if (!hasContent) return;
+
+  smartGoals.unshift({
+    id: Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+    specific: vals.specific,
+    measurable: vals.measurable,
+    achievable: vals.achievable,
+    relevant: vals.relevant,
+    timebound: vals.timebound,
+    savedAt: new Date().toISOString()
+  });
+
+  fields.forEach(function(f) {
+    var el = document.getElementById('smart-input-' + f);
+    if (el) el.value = '';
+  });
+
+  saveSmartGoals();
+}
+
+function saveSmartGoals() {
+  localStorage.setItem('smart_goals', JSON.stringify(smartGoals));
+  if (typeof syncToCloud === 'function') syncToCloud('smart_goals', smartGoals);
+  renderSmartGoalCard();
+  renderSmartGoalHistory();
+}
+
+function deleteSmartGoalEntry(id) {
+  smartGoals = smartGoals.filter(function(g) { return g.id !== id; });
+  saveSmartGoals();
+}
+
+function renderSmartGoalCard() {
+  var nameEl = document.getElementById('smartGoalName');
+  var tagsEl = document.getElementById('smartGoalTags');
+  if (!nameEl || !tagsEl) return;
+
+  var current = smartGoals[0];
+  if (!current) {
+    nameEl.innerHTML = '...';
+    tagsEl.innerHTML = '';
+    return;
+  }
+
+  nameEl.innerHTML = current.specific || '...';
+
+  var vals = [current.measurable, current.achievable, current.relevant, current.timebound];
+  tagsEl.innerHTML = vals.filter(function(v) { return v; }).map(function(v) {
+    return '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:1.2rem;font-weight:300;color:var(--black);line-height:1.5;">' + v + '</div>';
+  }).join('');
+}
+
+function renderSmartGoalHistory() {
+  var el = document.getElementById('smart-goal-history');
+  if (!el) return;
+
+  if (smartGoals.length <= 1) { el.innerHTML = ''; return; }
+
+  el.innerHTML = smartGoals.slice(1).map(function(g) {
+    var d = new Date(g.savedAt);
+    var dateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    var timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return '<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
+      + '<div>'
+      + '<div style="font-family:\'Lora\',serif;font-size:0.88rem;color:var(--black);line-height:1.5;">' + (g.specific || '') + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;color:#bbb;margin-top:0.1rem;">' + dateStr + ' · ' + timeStr + '</div>'
+      + '</div>'
+      + '<button onclick="deleteSmartGoalEntry(\'' + g.id + '\')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:0.85rem;padding:0;line-height:1;margin-left:0.5rem;flex-shrink:0;">×</button>'
+      + '</div>';
+  }).join('');
+}
+
+renderSmartGoalCard();
+renderSmartGoalHistory();
 
 let ventEntries = JSON.parse(localStorage.getItem('vent_entries') || '[]');
 if (!Array.isArray(ventEntries)) ventEntries = [];
@@ -3780,6 +3907,8 @@ function reloadAllData() {
   books = JSON.parse(localStorage.getItem('my_books') || '[]'); if (!Array.isArray(books)) books = [];
   whoiItems = JSON.parse(localStorage.getItem('whoi_history') || '[]'); if (!Array.isArray(whoiItems)) whoiItems = [];
   visionItems = JSON.parse(localStorage.getItem('vision_items') || '[]'); if (!Array.isArray(visionItems)) visionItems = [];
+  smartGoals = JSON.parse(localStorage.getItem('smart_goals') || '[]'); if (!Array.isArray(smartGoals)) smartGoals = [];
+  smartGoals.forEach(function(g) { if (!g.id) g.id = Date.now() + '-' + Math.random().toString(36).slice(2, 8); });
   beliefBeliefs = JSON.parse(localStorage.getItem('belief_beliefs') || '[]'); if (!Array.isArray(beliefBeliefs)) beliefBeliefs = [];
   userRituals = JSON.parse(localStorage.getItem('user_rituals') || '[]'); if (!Array.isArray(userRituals)) userRituals = [];
   ritualState = JSON.parse(localStorage.getItem('ritual_state') || '{}');
@@ -3817,6 +3946,8 @@ function reloadAllData() {
   if (typeof jesusRenderStudyNotes === 'function') jesusRenderStudyNotes();
   if (typeof jesusRenderStudyQuestions === 'function') jesusRenderStudyQuestions();
   // Vision
+  if (typeof renderSmartGoalCard === 'function') renderSmartGoalCard();
+  if (typeof renderSmartGoalHistory === 'function') renderSmartGoalHistory();
   if (typeof renderWhoiDay === 'function') renderWhoiDay();
   if (typeof renderRituals === 'function') renderRituals();
   if (typeof initRituals === 'function') initRituals();
@@ -4382,7 +4513,7 @@ function belCheckinRender() {
 
 
 function showMeTab(tab) {
-  ['whiam','intj','blueprint','me','assertive','believe','rightforme','friends'].forEach(function(t) {
+  ['whiam','intj','me','assertive','believe','rightforme','friends'].forEach(function(t) {
     var el = document.getElementById('mesub-' + t);
     var btn = document.getElementById('metab-' + t);
     if (t === 'believe') {
@@ -4395,12 +4526,10 @@ function showMeTab(tab) {
   if (tab === 'assertive') { assCheckinRender(); belCheckinRender(); }
   if (tab === 'balance') { showMeTab('whiam'); setTimeout(function(){ wiaTab('balance'); initBalanceDatePicker(); renderBalanceQuestions(); renderRelationshipQuestions(); }, 50); return; }
   if (tab === 'assertive') { initAssertive(); initBelieve(); }
-  if (tab === 'intj') { intjRender(); if (typeof infpLoad === 'function') infpLoad(); }
-  if (tab === 'blueprint') { if (typeof bpLoad === 'function') bpLoad(); }
+  if (tab === 'intj') { intjRender(); if (typeof infpLoad === 'function') infpLoad(); if (typeof renderVisionBoard === 'function') renderVisionBoard(); }
   var _meHeaders = {
     whiam: { subtitle: 'Get to know you', title: 'Who I am.', desc: 'Everything that makes you, you 🤍' },
-    intj: { subtitle: 'Understand your mind', title: 'INTJ and me.', desc: 'How your personality shows up in daily life 🤍' },
-    blueprint: { subtitle: 'Design it on purpose', title: 'Blueprint.', desc: 'Your vision, values, and the goals that get you there 🤍' }
+    intj: { subtitle: 'Understand your mind', title: 'INTJ and me.', desc: 'How your personality shows up in daily life 🤍' }
   };
   if (_meHeaders[tab]) {
     var _stEl = document.getElementById('me-header-subtitle');
@@ -4919,7 +5048,6 @@ window.addEventListener('DOMContentLoaded', function() {
   <div id="me-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
     <button class="balance-sub-tab" onclick="showMeTab('intj')" id="metab-intj">INTJ and ME</button>
-    <button class="balance-sub-tab" onclick="showMeTab('blueprint')" id="metab-blueprint">Blueprint</button>
   </div>
 
   <!-- ME SUB-SECTIONS -->
@@ -5418,6 +5546,12 @@ window.addEventListener('DOMContentLoaded', function() {
     <div class="subtitle" style="margin-bottom:0.5rem;">INFP and INTJ</div>
     <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Your inner world matters. 🤍</div>
 
+    <!-- Vision Board -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label" style="text-align:center;margin-bottom:0.6rem;">Vision Board</div>
+      <div id="intj-vision-board-section" class="vision-board-mount"></div>
+    </div>
+
     <!-- Track Days toggle -->
     <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;cursor:pointer;" onclick="infpToggleCal()">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
@@ -5445,54 +5579,24 @@ window.addEventListener('DOMContentLoaded', function() {
     <!-- Who We Are -->
     <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
       <div class="planner-label" style="text-align:center;margin-bottom:0.6rem;font-size:0.8rem;">Who We Are</div>
-      <div style="display:flex;gap:0;">
-        <div style="flex:1;min-width:0;padding-right:0.7rem;border-right:1px solid #e8e8e5;">
-          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">Me</div>
-          <textarea id="infp-whoiam" placeholder="Who am I, right now: my personality, my values, what makes me, me..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'whoiam\')"></textarea>
-          <div id="infp-whoiam-entries" style="margin-top:0.6rem;"></div>
-          <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
-            <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
-            <textarea id="infp-whoiamnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'whoiamnotes\')"></textarea>
-            <div id="infp-whoiamnotes-entries" style="margin-top:0.4rem;"></div>
-          </div>
-        </div>
-        <div style="flex:1;min-width:0;padding-left:0.7rem;">
-          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">Him</div>
-          <textarea id="infp-whoheis" placeholder="Who is he, right now: his personality, his values, what makes him, him..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'whoheis\')"></textarea>
-          <div id="infp-whoheis-entries" style="margin-top:0.6rem;"></div>
-          <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
-            <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
-            <textarea id="infp-whoheisnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'whoheisnotes\')"></textarea>
-            <div id="infp-whoheisnotes-entries" style="margin-top:0.4rem;"></div>
-          </div>
-        </div>
+      <textarea id="infp-whoweare" placeholder="Who are we, right now: our personalities, our values, what makes us, us..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'whoweare\')"></textarea>
+      <div id="infp-whoweare-entries" style="margin-top:0.6rem;"></div>
+      <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
+        <textarea id="infp-whowearenotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'whowearenotes\')"></textarea>
+        <div id="infp-whowearenotes-entries" style="margin-top:0.4rem;"></div>
       </div>
     </div>
 
     <!-- Our Problems & Traumas -->
     <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
       <div class="planner-label" style="text-align:center;margin-bottom:0.6rem;font-size:0.8rem;">Our Problems & Traumas</div>
-      <div style="display:flex;gap:0;">
-        <div style="flex:1;min-width:0;padding-right:0.7rem;border-right:1px solid #e8e8e5;">
-          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">Mine</div>
-          <textarea id="infp-problems" placeholder="What am I carrying: my patterns, wounds, or triggers..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'problems\')"></textarea>
-          <div id="infp-problems-entries" style="margin-top:0.6rem;"></div>
-          <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
-            <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
-            <textarea id="infp-problemsnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'problemsnotes\')"></textarea>
-            <div id="infp-problemsnotes-entries" style="margin-top:0.4rem;"></div>
-          </div>
-        </div>
-        <div style="flex:1;min-width:0;padding-left:0.7rem;">
-          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;text-align:center;color:var(--gray);margin-bottom:0.5rem;">His</div>
-          <textarea id="infp-problemshis" placeholder="What is he carrying: his patterns, wounds, or triggers..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'problemshis\')"></textarea>
-          <div id="infp-problemshis-entries" style="margin-top:0.6rem;"></div>
-          <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
-            <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
-            <textarea id="infp-problemshisnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'problemshisnotes\')"></textarea>
-            <div id="infp-problemshisnotes-entries" style="margin-top:0.4rem;"></div>
-          </div>
-        </div>
+      <textarea id="infp-ourproblems" placeholder="What are we carrying: our patterns, wounds, or triggers..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;resize:none;min-height:80px;line-height:1.7;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'ourproblems\')"></textarea>
+      <div id="infp-ourproblems-entries" style="margin-top:0.6rem;"></div>
+      <div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px dashed #e0e0dc;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:0.4rem;">Notes</div>
+        <textarea id="infp-ourproblemsnotes" placeholder="A quick note..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;resize:none;min-height:40px;line-height:1.6;color:var(--black);box-sizing:border-box;" onblur="infpSaveEntry(\'ourproblemsnotes\')"></textarea>
+        <div id="infp-ourproblemsnotes-entries" style="margin-top:0.4rem;"></div>
       </div>
     </div>
 
@@ -5501,6 +5605,16 @@ window.addEventListener('DOMContentLoaded', function() {
       <div class="planner-label" style="font-size:0.8rem;">How We Can Solve It</div>
       <textarea id="infp-solutions" placeholder="What could help? What are we willing to try, ask for, or change..." onblur="infpSaveEntry('solutions')" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
       <div id="infp-solutions-entries" style="margin-top:0.6rem;"></div>
+    </div>
+
+    <!-- Ways We Support Each Other -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label" style="font-size:0.8rem;">Ways We Support Each Other</div>
+      <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem;margin-bottom:0.6rem;">
+        <input type="text" id="intjSupportInput" placeholder="e.g. give advance notice for plans" onkeydown="if(event.key==='Enter')intjAddItem('support')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
+        <button onclick="intjAddItem('support')" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
+      </div>
+      <div id="intj-list-support"></div>
     </div>
 
     <!-- Notes -->
@@ -5535,26 +5649,28 @@ window.addEventListener('DOMContentLoaded', function() {
 
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0 0 1.5rem;line-height:1.6;">Two different rhythms, one healthy life. Track time together, support your INTJ's needs, and make sure you're getting what you need too.</div>
 
-      <div style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Our Daily Schedule</div>
-      <div id="intj-schedule-list" style="margin-bottom:0.8rem;"></div>
-      <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-        <select id="intjScheduleHourInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;padding:0.45rem 0.5rem;color:var(--gray);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;"></select>
-        <select id="intjScheduleMinInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;padding:0.45rem 0.5rem;color:var(--gray);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;">
-          <option value="00">00</option>
-          <option value="15">15</option>
-          <option value="30">30</option>
-        </select>
-        <select id="intjScheduleAmPmInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;outline:none;padding:0.45rem 0.5rem;color:var(--gray);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;">
-          <option value="AM">AM</option>
-          <option value="PM">PM</option>
-        </select>
-        <input type="text" id="intjScheduleTextInput" placeholder="e.g. Good morning message" onkeydown="if(event.key==='Enter')intjAddSchedule()" style="flex:1;min-width:140px;border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;outline:none;padding:0.45rem 0.6rem;color:var(--black);">
-        <div id="intj-who-btns" style="display:flex;gap:0.4rem;flex-shrink:0;">
-          <button class="vision-type-btn active" data-who="both" onclick="selectIntjWho(this)">Both</button>
-          <button class="vision-type-btn" data-who="intj" onclick="selectIntjWho(this)">My INTJ</button>
-          <button class="vision-type-btn" data-who="me" onclick="selectIntjWho(this)">Me</button>
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+        <div class="planner-label" style="font-size:0.8rem;">Our Daily Schedule</div>
+        <div id="intj-schedule-list" style="margin-top:0.5rem;margin-bottom:0.8rem;"></div>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+          <select id="intjScheduleHourInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.58rem;font-weight:300;outline:none;padding:0.3rem 0.65rem;color:var(--gray);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;"></select>
+          <select id="intjScheduleMinInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.58rem;font-weight:300;outline:none;padding:0.3rem 0.65rem;color:var(--gray);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;">
+            <option value="00">00</option>
+            <option value="15">15</option>
+            <option value="30">30</option>
+          </select>
+          <select id="intjScheduleAmPmInput" style="border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.58rem;font-weight:300;outline:none;padding:0.3rem 0.65rem;color:var(--gray);flex-shrink:0;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;text-align:center;text-align-last:center;">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
+          <input type="text" id="intjScheduleTextInput" placeholder="e.g. Good morning message" onkeydown="if(event.key==='Enter')intjAddSchedule()" style="flex:1;min-width:140px;border:1px solid #c8c8c5;border-radius:0;background:none;font-family:'Nunito',sans-serif;font-size:0.58rem;font-weight:300;outline:none;padding:0.3rem 0.65rem;color:var(--black);">
+          <div id="intj-who-btns" style="display:flex;gap:0.4rem;flex-shrink:0;">
+            <button class="vision-type-btn active" data-who="both" onclick="selectIntjWho(this)" style="font-size:0.58rem;padding:0.3rem 0.65rem;">Both</button>
+            <button class="vision-type-btn" data-who="intj" onclick="selectIntjWho(this)" style="font-size:0.58rem;padding:0.3rem 0.65rem;">My INTJ</button>
+            <button class="vision-type-btn" data-who="me" onclick="selectIntjWho(this)" style="font-size:0.58rem;padding:0.3rem 0.65rem;">Me</button>
+          </div>
+          <button onclick="intjAddSchedule()" style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.65rem;flex-shrink:0;">Add</button>
         </div>
-        <button onclick="intjAddSchedule()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
       </div>
 
       <hr style="border:none;border-top:1px solid #e8e8e5;margin:1.8rem 0;">
@@ -5564,74 +5680,6 @@ window.addEventListener('DOMContentLoaded', function() {
       <div style="font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;line-height:1.5;">Mark when you talked or connected each day, morning, noon, or evening.</div>
       <div style="overflow-x:auto;margin-bottom:1rem;">
         <table id="intj-week-table" style="width:100%;border-collapse:collapse;font-family:'Nunito',sans-serif;font-size:0.98rem;"></table>
-      </div>
-
-      <hr style="border:none;border-top:1px solid #e8e8e5;margin:1.8rem 0;">
-
-      <div style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Ways I Can Support My INTJ</div>
-      <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.6rem;">
-        <input type="text" id="intjSupportIntjInput" placeholder="e.g. give advance notice for plans" onkeydown="if(event.key==='Enter')intjAddItem('supportIntj')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;outline:none;padding:0.3rem 0;">
-        <button onclick="intjAddItem('supportIntj')" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
-      </div>
-      <div id="intj-list-supportIntj"></div>
-
-      <hr style="border:none;border-top:1px solid #e8e8e5;margin:1.8rem 0;">
-
-      <div style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Ways I Need Support Too</div>
-      <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.6rem;">
-        <input type="text" id="intjSupportMeInput" placeholder="e.g. check in with words, not just actions" onkeydown="if(event.key==='Enter')intjAddItem('supportMe')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.98rem;font-weight:300;outline:none;padding:0.3rem 0;">
-        <button onclick="intjAddItem('supportMe')" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
-      </div>
-      <div id="intj-list-supportMe"></div>
-    </div>
-
-    <!-- BLUEPRINT -->
-    <div id="mesub-blueprint" style="display:none;">
-      <!-- Vision Board -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-        <div class="planner-label" style="text-align:center;margin-bottom:0.6rem;">Vision Board</div>
-        <div id="bp-vision-board-section" class="vision-board-mount"></div>
-      </div>
-
-      <!-- Life Vision -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-        <div class="planner-label">Life Vision</div>
-        <textarea id="bp-vision" placeholder="In 5-10 years, what does your life look like? Career, relationships, home, growth..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:70px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
-        <div style="margin-top:0.4rem;">
-          <button onclick="bpSaveEntry('vision')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
-        </div>
-        <div id="bp-vision-entries" style="margin-top:0.6rem;"></div>
-      </div>
-
-      <!-- Goals & Milestones -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-        <div class="planner-label">Goals &amp; Milestones</div>
-        <div id="bp-goals-list" style="margin-top:0.5rem;"></div>
-        <input id="bp-goals-input" placeholder="Add a goal or milestone..." onkeydown="if(event.key==='Enter')bpAddGoal()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-      </div>
-
-      <!-- Core Values -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-        <div class="planner-label">Core Values</div>
-        <textarea id="bp-values" placeholder="What matters most to you? The principles you want to build your life around..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
-        <div style="margin-top:0.4rem;">
-          <button onclick="bpSaveEntry('values')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
-        </div>
-        <div id="bp-values-entries" style="margin-top:0.6rem;"></div>
-      </div>
-
-      <!-- Notes & Reflections -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label">Notes &amp; Reflections</div>
-        <textarea id="bp-notes" placeholder="Thoughts on your path, ideas, things to revisit..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
-        <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
-          <button onclick="bpSaveEntry('notes')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
-          <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
-            + Photo <input type="file" accept="image/*" onchange="bpAddPhoto('notes',this)" style="display:none;">
-          </label>
-        </div>
-        <div id="bp-notes-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
-        <div id="bp-notes-entries" style="margin-top:0.6rem;"></div>
       </div>
     </div>
 
@@ -5881,7 +5929,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <div id="jsub-vent">
 
       <div id="vent-section" class="subtitle">Let it all out</div>
-      <h1>Journal.</h1>
+      <h2>Journal.</h2>
 
       <!-- Unified journal input -->
       <div style="padding-bottom:0.3rem;margin-bottom:0.6rem;">
@@ -10873,15 +10921,11 @@ function infpLoad() {
   try { infpData = JSON.parse(localStorage.getItem('infp_data') || '{}'); } catch(e) { infpData = {}; }
   infpRenderPhotos('notes');
   infpRenderEntries('notes');
-  infpRenderEntries('whoiam');
-  infpRenderEntries('whoheis');
-  infpRenderEntries('problems');
-  infpRenderEntries('problemshis');
+  infpRenderEntries('whoweare');
+  infpRenderEntries('ourproblems');
   infpRenderEntries('solutions');
-  infpRenderEntries('whoiamnotes');
-  infpRenderEntries('whoheisnotes');
-  infpRenderEntries('problemsnotes');
-  infpRenderEntries('problemshisnotes');
+  infpRenderEntries('whowearenotes');
+  infpRenderEntries('ourproblemsnotes');
 }
 
 function infpSave() {
@@ -10889,7 +10933,7 @@ function infpSave() {
 }
 
 // ── Auto-detect "solution" entries (Who We Are, Our Problems & Traumas, Notes & Reflections) ──
-var INFP_SOLUTION_SECTIONS = ['whoiam','whoheis','problems','problemshis','notes'];
+var INFP_SOLUTION_SECTIONS = ['whoweare','ourproblems','notes'];
 var INFP_SOLUTION_WORDS = ['solution','solve','solved','solving','fix','fixed','try','let\'s try',
   'we could','we can','we will','i will','i\'ll','let\'s','going forward','next time','instead',
   'agree','agreed','plan to','commit','change','improve','better if','what could help',
@@ -11011,164 +11055,6 @@ function infpRenderPhotos(section) {
       + '<button onclick="infpDeletePhoto(\'' + section + '\',' + p.id + ')" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.5);border:none;color:white;width:18px;height:18px;font-size:0.7rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;border-radius:50%;">×</button>'
       + '</div>'
       + (p.time ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);margin-top:0.2rem;max-width:80px;line-height:1.3;">' + p.time + '</div>' : '')
-      + '</div>';
-  }).join('');
-}
-
-// ── Blueprint (Life Vision, Goals & Milestones, Core Values, Notes) ──
-var bpData = {};
-
-function bpLoad() {
-  try { bpData = JSON.parse(localStorage.getItem('bp_data') || '{}'); } catch(e) { bpData = {}; }
-  bpRenderEntries('vision');
-  bpRenderEntries('values');
-  bpRenderEntries('notes');
-  bpRenderPhotos('notes');
-  bpRenderGoals();
-  if (typeof renderVisionBoard === 'function') renderVisionBoard();
-}
-
-function bpSave() {
-  localStorage.setItem('bp_data', JSON.stringify(bpData));
-}
-
-function bpSaveEntry(section) {
-  var inp = document.getElementById('bp-' + section);
-  if (!inp) return;
-  var text = inp.value.trim();
-  if (!text) return;
-  if (!bpData.entries) bpData.entries = {};
-  if (!bpData.entries[section]) bpData.entries[section] = [];
-  var now = new Date();
-  var time = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  var dateKey = _localDateStr(now);
-  bpData.entries[section].unshift({ id: Date.now(), text: text, time: time, dateKey: dateKey });
-  bpSave();
-  inp.value = '';
-  bpRenderEntries(section);
-}
-
-function bpDeleteEntry(section, id) {
-  if (!bpData.entries || !bpData.entries[section]) return;
-  bpData.entries[section] = bpData.entries[section].filter(function(e){ return e.id !== id; });
-  bpSave();
-  bpRenderEntries(section);
-}
-
-function bpRenderEntries(section) {
-  var el = document.getElementById('bp-' + section + '-entries');
-  if (!el) return;
-  var list = (bpData.entries && bpData.entries[section]) || [];
-  if (!list.length) { el.innerHTML = ''; return; }
-  el.innerHTML = list.map(function(e) {
-    return '<div style="border-top:1px solid #eee;padding-top:0.6rem;margin-top:0.6rem;">'
-      + '<div style="display:flex;justify-content:space-between;align-items:center;">'
-      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">' + e.time + '</div>'
-      + '<button onclick="bpDeleteEntry(\''+section+'\','+e.id+')" style="font-size:0.8rem;color:#bbb;border:none;background:none;cursor:pointer;padding:0;line-height:1;">×</button>'
-      + '</div>'
-      + '<div style="margin-top:0.3rem;font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);line-height:1.7;white-space:pre-wrap;">' + e.text + '</div>'
-      + '</div>';
-  }).join('');
-}
-
-function bpAddPhoto(section, input) {
-  var file = input.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    if (!bpData.photos) bpData.photos = {};
-    if (!bpData.photos[section]) bpData.photos[section] = [];
-    var _now = new Date();
-    var _time = _now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' · ' + _now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    bpData.photos[section].unshift({ id: Date.now(), src: e.target.result, date: new Date().toISOString(), time: _time });
-    bpSave();
-    bpRenderPhotos(section);
-  };
-  reader.readAsDataURL(file);
-  input.value = '';
-}
-
-function bpDeletePhoto(section, id) {
-  if (!bpData.photos || !bpData.photos[section]) return;
-  bpData.photos[section] = bpData.photos[section].filter(function(p){ return p.id !== id; });
-  bpSave();
-  bpRenderPhotos(section);
-}
-
-function bpViewPhoto(section, id) {
-  if (!bpData.photos || !bpData.photos[section]) return;
-  var p = bpData.photos[section].find(function(x){ return x.id === id; });
-  if (!p) return;
-  var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;display:flex;align-items:center;justify-content:center;';
-  function removeOverlay() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
-  overlay.onclick = removeOverlay;
-  var img = document.createElement('img');
-  img.src = p.src;
-  img.style.cssText = 'max-width:92vw;max-height:88vh;object-fit:contain;display:block;';
-  var close = document.createElement('button');
-  close.textContent = '×';
-  close.style.cssText = 'position:absolute;top:1rem;right:1rem;background:none;border:none;color:white;font-size:2rem;cursor:pointer;line-height:1;';
-  close.onclick = function(e){ e.stopPropagation(); removeOverlay(); };
-  overlay.appendChild(img);
-  overlay.appendChild(close);
-  document.body.appendChild(overlay);
-}
-
-function bpRenderPhotos(section) {
-  var el = document.getElementById('bp-' + section + '-photos');
-  if (!el) return;
-  var list = (bpData.photos && bpData.photos[section]) || [];
-  el.innerHTML = list.map(function(p){
-    return '<div style="position:relative;">'
-      + '<div style="position:relative;width:80px;height:80px;">'
-      + '<img src="' + p.src + '" onclick="bpViewPhoto(\'' + section + '\',' + p.id + ')" style="width:80px;height:80px;object-fit:cover;display:block;cursor:pointer;">'
-      + '<button onclick="bpDeletePhoto(\'' + section + '\',' + p.id + ')" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.5);border:none;color:white;width:18px;height:18px;font-size:0.7rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;border-radius:50%;">×</button>'
-      + '</div>'
-      + (p.time ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);margin-top:0.2rem;max-width:80px;line-height:1.3;">' + p.time + '</div>' : '')
-      + '</div>';
-  }).join('');
-}
-
-function bpAddGoal() {
-  var inp = document.getElementById('bp-goals-input');
-  var text = inp.value.trim();
-  if (!text) return;
-  if (!bpData.goals) bpData.goals = [];
-  var now = new Date();
-  var time = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  bpData.goals.push({ id: Date.now(), text: text, done: false, time: time });
-  bpSave();
-  inp.value = '';
-  bpRenderGoals();
-}
-
-function bpToggleGoal(id) {
-  bpData.goals = (bpData.goals || []).map(function(g){ return g.id === id ? Object.assign({}, g, { done: !g.done }) : g; });
-  bpSave();
-  bpRenderGoals();
-}
-
-function bpDeleteGoal(id) {
-  bpData.goals = (bpData.goals || []).filter(function(g){ return g.id !== id; });
-  bpSave();
-  bpRenderGoals();
-}
-
-function bpRenderGoals() {
-  var el = document.getElementById('bp-goals-list');
-  if (!el) return;
-  var list = bpData.goals || [];
-  el.innerHTML = list.map(function(g){
-    return '<div style="padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
-      + '<div style="display:flex;align-items:center;gap:0.6rem;">'
-      + '<div onclick="bpToggleGoal(' + g.id + ')" style="cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid ' + (g.done ? 'var(--black)' : '#c8c8c5') + ';background:' + (g.done ? 'var(--black)' : 'transparent') + ';flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
-      + (g.done ? '<svg width="9" height="9" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="1.8"/></svg>' : '')
-      + '</div>'
-      + '<div onclick="bpToggleGoal(' + g.id + ')" style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;color:' + (g.done ? '#bbb' : 'var(--black)') + ';text-decoration:' + (g.done ? 'line-through' : 'none') + ';cursor:pointer;">' + g.text + '</div>'
-      + '<button onclick="bpDeleteGoal(' + g.id + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:1rem;padding:0;">×</button>'
-      + '</div>'
-      + (g.time ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-top:0.1rem;padding-left:22px;">' + g.time + '</div>' : '')
       + '</div>';
   }).join('');
 }
@@ -12671,11 +12557,13 @@ var INTJ_DEFAULT_SCHEDULE = [
   { time: '9:30 PM',  text: 'Goodnight message', who: 'both' }
 ];
 var intjData = JSON.parse(localStorage.getItem('intj_data') || 'null') || {
-  week: {}, supportIntj: [], supportMe: [], checkins: [], schedule: null
+  week: {}, support: [], checkins: [], schedule: null
 };
 if (!intjData.week) intjData.week = {};
-if (!intjData.supportIntj) intjData.supportIntj = [];
-if (!intjData.supportMe) intjData.supportMe = [];
+if (!intjData.support) {
+  // Migrate any previously saved separate lists into the merged one
+  intjData.support = [].concat(intjData.supportIntj || [], intjData.supportMe || []);
+}
 if (!intjData.checkins) intjData.checkins = [];
 if (!intjData.weekNotes) intjData.weekNotes = {};
 if (!Array.isArray(intjData.schedule)) intjData.schedule = INTJ_DEFAULT_SCHEDULE.slice();
@@ -12690,8 +12578,7 @@ function intjRender() {
   intjRenderSchedule();
   intjRenderWeek();
   intjRenderCalendar();
-  intjRenderList('supportIntj');
-  intjRenderList('supportMe');
+  intjRenderList('support');
   intjRenderCheckins();
 }
 
@@ -12723,10 +12610,10 @@ function intjRenderSchedule() {
     var item = entry.item, i = entry.i;
     return '<div style="border:none;padding:0.3rem 0.7rem;position:relative;">'
       + '<div style="position:absolute;top:0.4rem;right:0.4rem;display:flex;align-items:center;gap:0.8rem;">'
-      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:2px 7px;">' + intjWhoLabel(item.who) + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--white);background:var(--black);border:1px solid var(--black);padding:2px 7px;">' + intjWhoLabel(item.who) + '</div>'
       + '<button onclick="intjDeleteSchedule(' + i + ')" style="font-size:0.6rem;color:var(--gray);border:none;background:none;cursor:pointer;line-height:1;">✕</button>'
       + '</div>'
-      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:var(--gray);line-height:1.5;padding-right:5rem;">' + (item.time ? '<span style="font-size:0.85rem;">' + item.time + '</span> - ' : '') + item.text + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:var(--black);line-height:1.5;padding-right:5rem;">' + (item.time ? '<span style="font-size:0.85rem;">' + item.time + '</span> - ' : '') + item.text + '</div>'
       + '</div>';
   }).join('') + '</div>';
 }
@@ -12866,14 +12753,8 @@ function intjRenderCalendar() {
       + '</div>';
   }).join('');
 
-  var supportIntjHtml = (intjData.supportIntj && intjData.supportIntj.length)
-    ? intjData.supportIntj.map(function(item) {
-        return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:' + (item.done ? 'var(--gray)' : 'var(--black)') + ';padding:0.2rem 0;display:flex;align-items:center;gap:0.4rem;">' + intjHeartIcon(!!item.done) + '<span>' + item.text + '</span></div>';
-      }).join('')
-    : intjEmptyRow('Nothing added yet.');
-
-  var supportMeHtml = (intjData.supportMe && intjData.supportMe.length)
-    ? intjData.supportMe.map(function(item) {
+  var supportHtml = (intjData.support && intjData.support.length)
+    ? intjData.support.map(function(item) {
         return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:' + (item.done ? 'var(--gray)' : 'var(--black)') + ';padding:0.2rem 0;display:flex;align-items:center;gap:0.4rem;">' + intjHeartIcon(!!item.done) + '<span>' + item.text + '</span></div>';
       }).join('')
     : intjEmptyRow('Nothing added yet.');
@@ -12894,8 +12775,7 @@ function intjRenderCalendar() {
     : intjEmptyRow('No check-ins logged this week yet.');
 
   el.innerHTML = daysHtml
-    + intjSectionLabel('Ways I Can Support My INTJ') + supportIntjHtml
-    + intjSectionLabel('Ways I Need Support Too') + supportMeHtml;
+    + intjSectionLabel('Ways We Support Each Other') + supportHtml;
 }
 
 var _intjModalKey = null;
@@ -13000,7 +12880,7 @@ function intjSavePeriodNote(key, period, value) {
 }
 
 function intjAddItem(key) {
-  var inputId = key === 'supportIntj' ? 'intjSupportIntjInput' : 'intjSupportMeInput';
+  var inputId = key === 'support' ? 'intjSupportInput' : (key === 'supportIntj' ? 'intjSupportIntjInput' : 'intjSupportMeInput');
   var inp = document.getElementById(inputId);
   if (!inp) return;
   var val = inp.value.trim();
@@ -13031,7 +12911,7 @@ function intjRenderList(key) {
   var el = document.getElementById('intj-list-' + key);
   if (!el) return;
   var items = intjData[key];
-  if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.98rem;color:var(--gray);padding:0.4rem 0;">Nothing added yet.</div>'; return; }
+  if (!items.length) { el.innerHTML = ''; return; }
   el.innerHTML = items.map(function(item, i) {
     return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
       + '<div style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.98rem;font-weight:300;color:var(--black);' + (item.done ? 'color:var(--gray);' : '') + '">' + item.text + '</div>'
